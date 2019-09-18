@@ -1,0 +1,2 @@
+# Simulation_Based_Power_Analysis_For_Factorial_ANOVA_Designs
+Repository for the manuscript Simulation Based Power Analysis For Factorial ANOVA Designs
