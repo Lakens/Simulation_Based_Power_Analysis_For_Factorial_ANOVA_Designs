@@ -34,7 +34,7 @@ editor_options:
   chunk_output_type: console
 ---
 ```{r load_packages, include=FALSE}
-#devtools::install_github("arcaldwell49/Superpower")
+devtools::install_github("arcaldwell49/Superpower")
 library(Superpower)
 library(ggplot2)
 library(dplyr)
@@ -50,6 +50,13 @@ manuscript_seed = 2019
 Superpower_options(plot = FALSE, verbose = FALSE)
 ```
 
+NOTES TO FIX:
+
+in the long run `r round(100*power_oneway_between(ANOVA_design(design = "2b", 80, c(1,0), 2, 0, c("condition", "cheerful", "sad"), FALSE))$power, 2)`% gives incorrect power estimate. Remove 100*? Also badly rounded. 
+I have now added a footnote that we use sample means by default. You added 'sample' to means in Cohen's d's calculation. I removed it. Cohen's f was specified as population means - but I would suggest we also refer to sample means there (so observed scores). Then the following statement that they are directly related holds. Otherwise formally it does not hold (since we confuse population sd and sample sd). Right?
+For a one-way between subjets design, do we provide Welch's f test? Not currently, right? Whereas it is good to do so if we assume variances are unequal. Would be another reason to use simulations (I think - not sure power formula exists). Maybe with Games-Howel post-hoc tests? (or just Welch's t-test for simple comparisons)
+
+
 When a researcher aims to test hypotheses with an analysis of variance (ANOVA), the sample size of the study should be justified based on the statistical power of the test. 
 The statistical power of a test is the probability of rejecting the null-hypothesis, given a specified effect size, alpha level, and sample size. 
 When power is low there is a high probability of concluding there is no effect when an underlying effect may exist in the population of interest.
@@ -61,31 +68,31 @@ Simulations based on a specified pattern of means and a covariance matrix (based
 However, such simulations typically require extensive programming knowledge.
 
 In this manuscript we introduce Superpower, an R package and Shiny app that can be used to perform power analyses for factorial ANOVA designs based on simulations. 
-Superpower can be used to calculate the statistical power based on a predicted pattern of means, standard deviations, and correlations (for within-subject factors).
+Superpower can be used to perform a-priori power analyses based on a predicted pattern of means, standard deviations, and (for within-subject factors) correlations.
 By simulating data for factorial designs with specific parameters researchers can gain a better understanding of the factors that determine the statistical power of an ANOVA, and learn how to design well-powered experiments.
-After a short introduction to statistical power, focussing on the *F*-test, we will illustrate through simulations how the power of factorial ANOVA designs depend on the pattern of means across conditions, the number of factors and levels, the sample size, and whether you need to control the alpha level for multiple comparisons.
+After a short introduction to statistical power, focusing on the *F*-test, we will illustrate through simulations how the power of factorial ANOVA designs depend on the pattern of means across conditions, the number of factors and levels, the sample size, and whether you need to control the alpha level for multiple comparisons.
 
-# A simple scenario for power analysis
+# A basic example
 
 Imagine you plan to perform a study in which participants interact with an artificial voice assistant who sounds either cheerful or sad.
 You measure how much 80 participants in each condition enjoy interacting with with the voice assistant on a line marking scale (coded continuously from -5 to 5) and observe a mean of 0 in the sad condition, and a mean of 1 in the cheerful condition, with an estimated standard deviation of 2. 
-
 After submitting your manuscript for publication, reviewers ask you to add a study with a neutral control condition to examine whether cheerful voices increase, or sad voices decrease enjoyment (or both).
 Depending on what the mean enjoyment in the neutral condition is, what sample size would you need to collect for a high powered test of the expected pattern of means? 
 A collaborator suggests to switch from a between-subject design to a within-subject design to collect data more efficiently.
-What impact will switching from a between-subject to a within-subject design have on the required sample size?
-The effect size in the first study could be considered 'medium' based on the benchmarks by @cohen_statistical_1988, but does it make sense to plan for a 'medium' effect size in either the between-subject or within-subject ANOVA design?
+What impact will switching to a within-subject design have on the required sample size?
+The effect size in the first study is sometimes refered to as a 'medium' effect size based on the benchmarks by @cohen_statistical_1988. 
+Does it make sense to perform an a-priori power analysis for a 'medium' effect size if we add a third betwee-subject condition, or switch to a within-subject ANOVA design?
 And if you justify the sample size based on the power for the main effect for the ANOVA, will the study also have sufficient statistical power for the independent comparisons between conditions (or vice versa)?
+Before we answer these questions, let's consider some of the basic concepts of statistical power and how power calculations are typically performed.
 
-# Calculating Power for ANOVAs
+# Calculating Power for ANOVA Designs
 
-Before we directly answer these questions, let's consider some of the basic concepts of statistical power and how power calculations are typically performed.
-Let's consider the initial study described above, where enjoyment is measured when 80 participants per condition interact with a cheerful or sad voice assistant.
+Let's consider the initial design described above, where enjoyment is measured when 80 participants per condition interact with a cheerful or sad voice assistant.
 We can test the difference between two means with a *t*-test or a one-way ANOVA, and the two tests are mathematically equivalent. 
-Figure \ref{fig:d-plot} and Figure \ref{fig:eta-plot} visualize the distribution of the effect sizes Cohen's d (for the *t*-test) and $\eta_p^2$ (for the *F*-test) that should be observed when there is no effect (grey curves) and when the observed difference between means equals the true effect (black curves).
-In both figures the light grey areas under the null-distribution mark the observed results that would lead to a Type 1 error (observing a statistically significant result if the null-hypothesis is true) and the dark grey areas under the curve mark the observed effect sizes that would lead to a Type 2 error (observing a non-significant result when there is a true effect).
+Figure \ref{fig:d-plot} and Figure \ref{fig:eta-plot} visualize the distribution of the effect sizes Cohen's d (for the *t*-test) and $\eta_p^2$ (for the *F*-test) that should be observed when there is no effect (grey curves) and when the observed difference between means equals the true effect (black curves)^[Note that we refer to sample level statistics by default, and explicitly mention whenever we refer to population parameters instead.].
+In both figures the light grey areas under the null-distribution mark the observed effect sizes that would lead to a Type 1 error (observing a statistically significant result if the null-hypothesis is true) and the dark grey areas under the curve mark the observed effect sizes that would lead to a Type 2 error (observing a non-significant result when there is a true effect).
 
-```{r d-plot, fig.width=7, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.cap="Distribution of Cohen's d under the null-hypothesis (grey curve) and alternative hypothesis assuming d = 0.5 (black curve)."}
+```{r d-plot, fig.width=7, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.cap="Distribution of Cohen's d under the null-hypothesis (grey curve) and alternative hypothesis assuming d = 0.5 (black curve) given n = 80."}
     N <- 80
     d <- 0.5
     p_upper<-.05
@@ -128,7 +135,7 @@ In both figures the light grey areas under the null-distribution mark the observ
     segments(-crit_d, 0, -crit_d, y_max-0.8, col= 'black', lwd=2, lty = "dashed")
 ```
 
-```{r eta-plot, fig.width=7, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.cap="Distribution of eta-squared under the null-hypothesis (grey curve) and alternative hypothesis assuming partial eta-squared = 0.0588 (black curve)."}
+```{r eta-plot, fig.width=7, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.cap="Distribution of eta-squared under the null-hypothesis (grey curve) and alternative hypothesis assuming partial eta-squared = 0.0588 (black curve) given n = 80."}
 
     N<-80
     J<-2
@@ -171,21 +178,22 @@ In both figures the light grey areas under the null-distribution mark the observ
     
 ```
 
-When the observed data are more extreme than a critical value, the test result is statistically significant.
-Critical values are often expressed as *t*-values or *F*-values, but for a given sample size they can also be expressed as critical *effect sizes*.
+A test result is statistically significant when the *p*-value is smaller than the alpha level, or when the test statistical (e.g., a *F*-value) is larger than a critical value. 
+For a given sample size we can also calculate a critical *effect size*, and a result is statistically significant if the observed effect size is more extreme than the critical effect size. 
 Given the sample size of 80 participants per group, observed effects are statistically significant when they are larger than d = `r crit_d` in a *t*-test, or $\eta_p^2$ = `r eta_pop_crit` for the *F*-test.
-The goal of an a-priori power analysis is to choose a sample size for which the probability of observing a statistically significant effect reaches a desired probability. 
-To calculate power, one has to specify the alternative hypothesis (the black curves in Figure \ref{fig:d-plot} and \ref{fig:eta-plot}).
-If we assume that under the alternative hypothesis the true effect size is d = 0.5 or $\eta_p^2$ = 0.0588, and data are collected from 80 participants in each condition, in the long run `r round(100*power_oneway_between(ANOVA_design(design = "2b", 80, c(1,0), 2, 0, c("condition", "cheerful", "sad"), FALSE))$power, 2)`% of the observed data will yield statistically significant results.
+The goal of an a-priori power analysis is to design a study with a desired probability of observing a significant effect. 
+To calculate the sample size required to reach a desired statistical power one has to specify the alternative hypothesis (the black curves in Figure \ref{fig:d-plot} and \ref{fig:eta-plot}), the sample size, and the alpha level.
+Under the alternative hypothesis that the true effect size is d = 0.5 or $\eta_p^2$ = 0.0588, data are collected from 80 participants in each condition, and an alpha of 0.05 is used, in the long run `r round(100*power_oneway_between(ANOVA_design(design = "2b", 80, c(1,0), 2, 0, c("condition", "cheerful", "sad"), FALSE))$power, 2)`% of the observed data will yield statistically significant results.
 
-The *t*-test can examine the difference between two means $(m_1 - m_2)$, and the *F*-test computes the ratio of the between group variance and the within group variance. 
+**THIS SHOULD BE A BOX I THINK **
+The *t*-test can examine the difference between two means $(m_1 - m_2)$, and the *F*-test computes the ratio of the between group variance and the within group variance.
 For two independent groups, the *t*-statistic can easily be translated to the *F*-ratio $F = t^2$.
-Cohen's d, a standardized effect size, is calculated by dividing the difference between sample means by the standard deviation, or 
+Cohen's d, a standardized effect size, is calculated by dividing the difference between means by the standard deviation, or 
 \begin{equation}
 d = \frac{m_1-m_2}{\sigma}.
 \end{equation}
 If we have two groups with the sample means of 0 and 1, and the standard deviation is 2, Cohen's d is (1-0)/2, or 0.5.
-The generalization of Cohen's d to more than two groups is Cohen's f, which is the standard deviation of the population means divided by the population standard deviation [@cohen_statistical_1988], or: 
+The generalization of Cohen's d to more than two groups is Cohen's f, which is the standard deviation of the means divided by the standard deviation [@cohen_statistical_1988], or: 
 \begin{equation}
 f = \frac{\sigma _{ m }}{\sigma}
 \end{equation}
@@ -217,7 +225,9 @@ In a between-participants one-way ANOVA lambda is calculated as:
 \lambda = f^2 \times N \label{eq:lambda}
 \end{equation}
 where f is Cohen's f and N is the total sample size. 
-Based on $\lambda$ (which is the noncentrality parameter of the noncentral F distribution, Figure \ref{fig:eta-plot}) and the critical test statistic (which specifies the part of the distribution that is more extreme than the test statistic needed for a statistically significant test result) we can calculate how much of the distribution under the alternative hypothesis will be statistically significant in the long run (i.e., the area under the black curve in Figure \ref{fig:eta-plot} to the right of the critical effect size). 
+Based on $\lambda$ (the noncentrality parameter of the noncentral F distribution, which together with the degrees of freedom specifies the shape of the expected effect size distribution under a specified alternative hypothesis, Figure \ref{fig:eta-plot}) we can calculate the area under the curve that is more extreme than the critical effect size (i.e., Figure \ref{fig:eta-plot} to the right of the critical effect size).
+Although these analytical functions are fast and easy, we can't always calculate power using these approaches, and have to rely on simulations instead. 
+This becomes necessary when researchers use sequential approaches to corrections for multiple comparisons, such as the Holm procedure, or when test assumptions such as the sphericity assumption are violated. 
 
 # Simulating Statistical Power for Different Factorial Designs
 
