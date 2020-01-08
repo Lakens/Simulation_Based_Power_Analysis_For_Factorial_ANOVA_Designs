@@ -248,9 +248,8 @@ design_result <- ANOVA_design(
 
 An example of the input in the Shiny app is:
 
-```{r, scr2, fig.cap="Screenshot of ANOVA_power Shiny app"}
-knitr::include_graphics("screenshots/anova_power.png")
-```
+![Screenshot of ANOVA_power Shiny app.](screenshots/anova_power.png)
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 design_result <- ANOVA_design(design = "2b", n = 80, mu = c(1, 0), sd = 2, labelnames = c("condition", "cheerful", "sad"))
@@ -268,7 +267,7 @@ power_result_analytic <- power_oneway_between(design_result)$power
 power_result_exact <- ANOVA_exact(design_result, verbose = FALSE)$main_results$power
 ```
 
-For a visual confirmation of the input a figure is created that displays the means and standard deviation (see the right side of Figure \ref{fig:scr2}).
+For a visual confirmation of the input a figure is created that displays the means and standard deviation (see the right side of Figure 3).
 After the design has been specified there are two ways to calculate the statistical power of an ANOVA through simulations. 
 The first is to repeatedly simulate datasets and compute the percentage of statistically significant results. This is completed with the ANOVA_power function which performs a Monte Carlo simulation.
 

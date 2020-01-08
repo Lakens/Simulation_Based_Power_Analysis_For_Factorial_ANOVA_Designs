@@ -1,33 +1,45 @@
-\documentclass[,man,floatsintext]{apa6}
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  ,man,floatsintext]{apa6}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
-\usepackage{fixltx2e} % provides \textsubscript
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
 \else % if luatex or xelatex
-  \ifxetex
-    \usepackage{mathspec}
-  \else
-    \usepackage{fontspec}
-  \fi
-  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
 }{}
-\usepackage{hyperref}
-\hypersetup{unicode=true,
-            pdftitle={Simulation-Based Power-Analysis for Factorial ANOVA Designs},
-            pdfauthor={Daniël Lakens~\& Aaron R. Caldwell},
-            pdfkeywords={power analysis, ANOVA, hypothesis test, sample size justification, repeated measures},
-            pdfborder={0 0 0},
-            breaklinks=true}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Simulation-Based Power-Analysis for Factorial ANOVA Designs},
+  pdfauthor={Daniël Lakens~\& Aaron R. Caldwell},
+  pdfkeywords={power analysis, ANOVA, hypothesis test, sample size justification, repeated measures},
+  pdfborder={0 0 0},
+  breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
 \usepackage{color}
 \usepackage{fancyvrb}
@@ -78,35 +90,25 @@
 % margins by default, and it is still possible to overwrite the defaults
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
-\IfFileExists{parskip.sty}{%
-\usepackage{parskip}
-}{% else
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt plus 2pt minus 1pt}
-}
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{0}
+\setcounter{secnumdepth}{-2}
 % Redefines (sub)paragraphs to behave more like sections
 \ifx\paragraph\undefined\else
-\let\oldparagraph\paragraph
-\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
 \fi
 \ifx\subparagraph\undefined\else
-\let\oldsubparagraph\subparagraph
-\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
 \fi
 
-%%% Use protect on footnotes to avoid problems with footnotes in titles
-\let\rmarkdownfootnote\footnote%
-\def\footnote{\protect\rmarkdownfootnote}
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
 
-
-  \title{Simulation-Based Power-Analysis for Factorial ANOVA Designs}
-    \author{Daniël Lakens\textsuperscript{1}~\& Aaron R. Caldwell\textsuperscript{2,3}}
-    \date{}
-  
 \shorttitle{ANOVA Power}
 \affiliation{
 \vspace{0.5cm}
@@ -135,6 +137,10 @@
 \usepackage{setspace}
 \floatplacement{figure}{H}
 \raggedbottom
+
+\title{Simulation-Based Power-Analysis for Factorial ANOVA Designs}
+\author{Daniël Lakens\textsuperscript{1}~\& Aaron R. Caldwell\textsuperscript{2,3}}
+\date{}
 
 \authornote{
 
@@ -268,11 +274,13 @@ An example of the R code is:
 
 An example of the input in the Shiny app is:
 
-\textbackslash begin\{figure\}
-\includegraphics[width=6.69in]{screenshots/anova_power} \textbackslash caption\{Screenshot of ANOVA\_power Shiny app\}\label{fig:scr2}
-\textbackslash end\{figure\}
+\begin{figure}
+\centering
+\includegraphics{screenshots/anova_power.png}
+\caption{Screenshot of ANOVA\_power Shiny app.}
+\end{figure}
 
-For a visual confirmation of the input a figure is created that displays the means and standard deviation (see the right side of Figure \ref{fig:scr2}).
+For a visual confirmation of the input a figure is created that displays the means and standard deviation (see the right side of Figure 3).
 After the design has been specified there are two ways to calculate the statistical power of an ANOVA through simulations.
 The first is to repeatedly simulate datasets and compute the percentage of statistically significant results. This is completed with the ANOVA\_power function which performs a Monte Carlo simulation.
 
@@ -426,37 +434,37 @@ As explained in Box 2 G*Power by default uses a different calculation for \(\eta
 This default often leads to errors for power analyses that include within-subject factors when researchers perform a power analysis on an effect size reported in the published literature.
 The Superpower package allows researchers to enter a correlation matrix that specifies the expected population correlation for each pair of measurements (i.e., correlation matrix), instead of entering a single correlation as in the example above.
 
-\begin{tcolorbox}[colback=black!5!white,colframe=white!5!black,title=Box 2. Formula for effect sizes for within designs]
-The effect size in a within-design is referred to as Cohen's $d_z$ (because it is the effect size of the difference score between \textit{x} and $y$, yielding $z$). The relation is:
+\textbackslash{}begin\{tcolorbox\}{[}colback=black!5!white,colframe=white!5!black,title=Box 2. Formula for effect sizes for within designs{]}
+The effect size in a within-design is referred to as Cohen's \(d_z\) (because it is the effect size of the difference score between \textit{x} and \textit{y}, yielding \textbackslash{}textit\{\{z\}). The relation is:
 \begin{equation}
 \sigma_{z}=\sigma\sqrt{2(1-\rho)}
 \end{equation}
-Cohen's $d_z$ is used in power analyses for dependent $t$-tests, but there is no equivalent Cohen's $f_z$ for a within-participant ANOVA, and Cohen's $f$ is identical for within and between designs. 
-Instead, the value for lambda ($\lambda$) is adjusted based on the correlation. 
-For a one-way within-participant design lambda is identical to Equation \\eqref{eq:lambda}, multiplied by *u*, a correction for within-subject designs, calculated as:
+Cohen's \(d_z\) is used in power analyses for dependent \(t\)-tests, but there is no equivalent Cohen's \(f_z\) for a within-participant ANOVA, and Cohen's \(f\) is identical for within and between designs.
+Instead, the value for lambda (\(\lambda\)) is adjusted based on the correlation.
+For a one-way within-participant design lambda is identical to Equation \eqref{eq:lambda}, multiplied by \textit{u}, a correction for within-subject designs, calculated as:
 \begin{equation}
 u = \frac{k}{1-\rho}
 \end{equation}
-where $k$ is the number of levels of the within-participant factor, and $\rho$ is the correlation between dependent variables.
+where \(k\) is the number of levels of the within-participant factor, and \(\rho\) is the correlation between dependent variables.
 Equations 4 and 5 no longer hold when measurements are correlated.
-The default settings in G\*Power expects an f or $\eta_p^2$ that does not incorporate the correlation, while the correlation is incorporated in the output of software packages such as SPSS. 
-One can  enter the $\eta_p^2$ from SPSS output in G\*Power after checking the 'as in SPSS' checkbox in the options window, but forgetting this is a common mistake in power analyses for within designs in G\*Power.
-For a one-way within-subject design, Cohen's $f$ can be converted into the Cohen's $f$ SPSS uses through:
+The default settings in G*Power expects an f or \(\eta_p^2\) that does not incorporate the correlation, while the correlation is incorporated in the output of software packages such as SPSS.
+One can enter the \(\eta_p^2\) from SPSS output in G*Power after checking the \enquote{as in SPSS} checkbox in the options window, but forgetting this is a common mistake in power analyses for within designs in G*Power.
+For a one-way within-subject design, Cohen's \(f\) can be converted into the Cohen's \(f\) SPSS uses through:
 \begin{equation}
 f^2_{SPSS} = f^2 \times \frac{k}{k-1} \times \frac{n}{n-1} \times \frac{1}{1-\rho}
 \end{equation}
-and subsequently tranformed to $\eta_p^2$ through Equation 5.
-\end{tcolorbox}
+and subsequently tranformed to \(\eta_p^2\) through Equation 5.
+\textbackslash{}end\{tcolorbox\}
 
 \hypertarget{power-for-interactions}{%
 \section{Power for Interactions}\label{power-for-interactions}}
 
 So far we have explored power analyses for one factor designs.
-Superpower can easily provide statistical power for designs with up to three factors of up to 999 levels (e.g., a 4b*2w2w would specify a mixed design with two within factors which 2 levels, and one between factor with 4 levels).
+Superpower can easily provide statistical power for designs with up to three factors of up to 999 levels (e.g., a 4b*2w*2w would specify a mixed design with two within factors which 2 levels, and one between factor with 4 levels).
 Let's assume the researcher plans to perform a follow-up experiment where in addition to making the voice sound cheerful or sad, a second factor is introduced by making the voice sound more robotic compared to the default human-like voice.
 Different patterns of results could be expected in this 2 by 2 design that lead to interactions.
 Either no effect is observed for robotic voices, or the opposite effect is observed for robotic voices (we enjoy a sad robotic voice more than a cheerful one, a \enquote{Marvin-the-Depressed-Robot Effect}).
-We specify the pattern of means as \texttt{(1,\ 0,\ 0,\ 0)\ for\ the\ ordinal\ interactions,\ or\ as}(1, 0, 0, 1)` for the cross-over (or disordinal) interaction, as illustrated below (see Figure \ref{fig:mean-plot} for the expected pattern of means).
+We specify the pattern of means as \texttt{(1,\ 0,\ 0,\ 0)} for the ordinal interactions, or as \texttt{(1,\ 0,\ 0,\ 1)} for the cross-over (or disordinal) interaction, as illustrated below (see Figure \ref{fig:mean-plot} for the expected pattern of means).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -493,11 +501,11 @@ It might therefore be more intuitive to perform a power analysis based on the ex
 Simulations (using either the ANOVA\_power or ANOVA\_exact functions) show we have 99.38\% power for the cross-over interaction when we collect 80 participants per condition, and 60.62\% power for the ordinal interaction.
 For comparison, the power for the simple effect corresponding to one-way ANOVA example we started with is 88.16\%.
 The cross-over interaction has much higher statistical power than the ordinal interaction because the effect size is twice as large, as explained in Box 3.
-The cross-over interaction also has more statistical power than the simple comparison, even thought the effect size is identical (Cohen's \(f\) = 0.25) because the sample size has doubled.
+The cross-over interaction also has more statistical power than the simple comparison, even though the effect size is identical (Cohen's \(f\) = 0.25) because the sample size has doubled.
 The interaction effect can be contrast coded as 1, -1, -1, 1, and thus tests the scores of 160 participants in the cheerful human and sad robot conditions against the scores of 160 participants in the cheerful robot and sad human conditions.
 The key insight here is that not the sample size per condition, but the pooled sample size across conditions compared in a contrast that determines the power for the main effects and the interaction (cf.~J. Westfall, 2015b).
 
-Superpower also allows users to plot the statistical power across a range of sample sizes for the ANOVA-exact function (when using the ANOVA\_power function, users will need to steadily increase or decrease the sample size in their simulations).
+Superpower also allows users to plot the statistical power across a range of sample sizes for the ANOVA\_exact function (when using the ANOVA\_power function, users will need to steadily increase or decrease the sample size in their simulations).
 This allows us to take a look at the statistical power the design has across a range of effects size.
 The code below plots the power from 10 participants per condition to 100 participants per condition for the ordinal interaction (see Figure \ref{fig:power-plot}).
 
@@ -525,11 +533,11 @@ When the effect size is halved, the required sample size to maintain the same st
 So far in manuscript we have shown how simulations can be useful for power analyses for ANOVA designs where all assumptions of the statistical tests are met.
 An ANOVA is quite robust against violations of the normality assumption, which means the Type 1 error rate remains close to the alpha level specified in the test. Violations of the homogeneity of variances assumption can be more impactful, especially when sample sizes are unequal between conditions.
 When the equal variances assumption is violated for a one-way ANOVA Welch's \emph{F}-test is a good default.
-When the sphericity assumption in within designs is violated (when the variances of the differences between all pairs are not equal) a non-sphericity correction can be applied (e.g., the Greenhouse-Geisser or Huynh-Feldt correction) or a Multivariate ANOVA (MANOVA) can be performed.
+When the sphericity assumption in within designs is violated (when the variances of the differences between all pairs are not equal) a sphericity correction can be applied (e.g., the Greenhouse-Geisser or Huynh-Feldt correction) or a Multivariate ANOVA (MANOVA) can be performed.
 Alternative approaches for ANOVA designs with multiple between factors exist, such as heteroskedasticity robust standard errors.
-Superpower allows researchers to perform power analyses for unequal variances by performing Welch' \emph{F}-test or by applying Greenhouse-Geisser or Huynh-Feldt corrections or a MANOVA.
+Superpower allows researchers to perform power analyses for unequal variances (or correlations) by performing Welch' \emph{F}-test, appying sphercity corrections, or a MANOVA.
 
-Although some recommendations have been provided to assist researchers to choose an approach to deal with violations of the homogeneity assumption (Algina \& Keselman, 1997), it is often unclear how consequential violations of the homogeneity assumption are.
+Although some recommendations have been provided to assist researchers to choose an approach to deal with violations of the homogeneity assumption (Algina \& Keselman, 1997), it is often unclear if these violations of the homogeneity assumption are consequential for a given study.
 So far we have used simulations in Superpower to simulate patterns of means where there is a true effect, but we can also simulate a null effect.
 Such Monte Carlo simulation studies are used in published articles to examine the Type 1 error rate under a range of assumptions and while performing different tests.
 Superpower makes it easy to perform such simulations studies for the specific scenario a researcher is faced with, and can help to make a decision whether violations of assumptions are something to worry about, and whether choices to deal with violations are sufficient.
@@ -562,11 +570,11 @@ If this is achieved, the Type 1 error rate it reduced to 4.98\%, which is accept
 \hypertarget{conclusion}{%
 \section{Conclusion}\label{conclusion}}
 
-It is important to justify the sample size when designing studies.
-Power analyses for more complex ANOVA designs typically required programming knowledge.
+It is important to justify the sample size when designing a study.
+Power analyses for more complex ANOVA designs have typically required programming knowledge.
+The R package, guide book, and Shiny apps (see \url{https://arcaldwell49.github.io/SuperpowerBook}) that accompany this tutorial enable researchers to perform simulations for factorial experiments of up to three factors and any number of levels, making it easy to perform simulation-based power analysis without extensive programming experience.
 Exploring the power for designs with specific patterns of means, standard deviations, and correlations between variables can be used to choose a design and sample size that provides the highest statistical power for future studies.
 Simulation based approaches can also help to provide a better understanding of the factors that influence the statistical power for factorial ANOVA designs, or the impact of violations of assumptions on the Type 1 error rate.
-The R package, guide book, and Shiny apps (see \url{https://arcaldwell49.github.io/SuperpowerBook}) that accompany this tutorial enable researchers to perform simulations for factorial experiments of up to three factors and any number of levels, making it easy to perform simulation-based power analysis without extensive programming experience.
 
 \hypertarget{author-contributions}{%
 \subsection{Author Contributions}\label{author-contributions}}
@@ -587,7 +595,7 @@ Many improvements to Superpower are based on feedback from Lisa DeBruine and the
 \hypertarget{declaration-of-conflicting-interests}{%
 \subsection{Declaration of Conflicting Interests}\label{declaration-of-conflicting-interests}}
 
-The opinions or assertions contained herein are the private views of the author(s) and are not to be construed as official or reflecting the views of the Army or the Department of Defense. Any citations of commercial organizations and trade names in this report do not constitute an official Department of the Army endorsement of approval of the products or services of these organizations. No authors have any conflicts of interest to disclose. Approved for public release; distribution is unlimited. The author(s) declared that there were no conflicts of interest with respect to the authorship or the publication of this article.
+The opinions or assertions contained herein are the private views of the author(s) and are not to be construed as official or reflecting the views of the Army or the Department of Defense. Any citations of commercial organizations and trade names in this report do not constitute an official Department of the Army endorsement of approval of the products or services of these organizations. Approved for public release; distribution is unlimited. The author(s) declared that there were no conflicts of interest with respect to the authorship or the publication of this article.
 
 \hypertarget{funding}{%
 \subsection{Funding}\label{funding}}
@@ -665,6 +673,5 @@ Westfall, J. (2015a). PANGEA: Power analysis for general anova designs. \emph{Un
 
 \leavevmode\hypertarget{ref-westfall_think_2015}{}%
 Westfall, J. (2015b, May). Think about total N, not n per cell. \emph{Cookie Scientist}. http://jakewestfall.org/blog/index.php/2015/05/26/think-about-total-n-not-n-per-cell/.
-
 
 \end{document}
