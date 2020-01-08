@@ -17,7 +17,7 @@ affiliation:
   - id            : "3"
     institution   : "Thermal and Mountain Medicine Division, U.S. Army Research Institute of Environmental Medicine, USA"
 abstract: |
-  Researchers often rely on analysis of variance (ANOVA) when they report results of experiments. To ensure a study is adequately powered to yield informative results when performing an ANOVA, researchers can perform an a-priori power analysis. However, power analysis for factorial ANOVA designs is often a challenge. Current software solutions do not enable power analyses for complex designs with several within-subject factors. Moreover, power analyses often need partial eta-squared or Cohen's f as input, but these effect sizes are not intuitive and do not generalize to different experimental designs. We have created the R package Superpower and an online Shiny app to enable researchers without extensive programming experience to perform simulation-based power analysis for ANOVA designs of up to three within- or between-subject factors, with an unlimited number of levels. Predicted effects are entered by specifying means, standard deviations, and correlations (for within-subject factors). The simulation provides the statistical power for all ANOVA main effects, interactions, and individual comparisons, and allow researchers to correct for multiple comparisons. The simulation plots *p*-value distributions for all tests, and power plots across a range of sample sizes. This tutorial will demonstrate how to perform power analysis for ANOVA designs, and highlights important factors that determine the statistical power of factorial ANOVA designs.
+  Researchers often rely on analysis of variance (ANOVA) when they report results of experiments. To ensure a study is adequately powered to yield informative results when performing an ANOVA, researchers can perform an a-priori power analysis. However, power analysis for factorial ANOVA designs is often a challenge. Current software solutions do not enable power analyses for complex designs with several within-subject factors. Moreover, power analyses often need partial eta-squared or Cohen's $f$ as input, but these effect sizes are not intuitive and do not generalize to different experimental designs. We have created the R package Superpower and online Shiny apps to enable researchers without extensive programming experience to perform simulation-based power analysis for ANOVA designs of up to three within- or between-subject factors, with an unlimited number of levels. Predicted effects are entered by specifying means, standard deviations, and correlations (for within-subject factors). The simulation provides the statistical power for all ANOVA main effects, interactions, and individual comparisons, and allow researchers to correct for multiple comparisons. The simulation plots *p*-value distributions for all tests, and power plots across a range of sample sizes. This tutorial will demonstrate how to perform power analysis for ANOVA designs, and highlights important factors that determine the statistical power of factorial ANOVA designs.
   
 keywords          : "power analysis, ANOVA, hypothesis test, sample size justification, repeated measures"
 wordcount         : 4654 words.
@@ -64,9 +64,9 @@ When a researcher aims to test hypotheses with an analysis of variance (ANOVA), 
 The statistical power of a test is the probability of rejecting the null-hypothesis, given a specified effect size, alpha level, and sample size. 
 When power is low there is a high probability of concluding there is no effect when an underlying effect may exist in the population of interest.
 Several excellent resources exist that explain power analyses, including books [@aberson_applied_2019; @cohen_statistical_1988], general reviews [@maxwell_sample_2008], and practical primers [@brysbaert_how_2019; @perugini_practical_2018]. 
-Whereas power analyses for individual comparisons are relatively easy to perform, power analyses for factorial ANOVA designs are a bigger challenge. There are many current software solutions that *can* calculate power for factorial ANOVAs [@faul_gpower_2007; @lang2017intermediately; @Campbell2012MorePower6F; @westfall2015pangea], but the options within these packages are often limited (e.g, Gpower has limited options for within subjects factors).
+Whereas power analyses for individual comparisons are relatively easy to perform, power analyses for factorial ANOVA designs are a bigger challenge. There are many current software solutions that *can* calculate power for factorial ANOVAs [@faul_gpower_2007; @lang2017intermediately; @Campbell2012MorePower6F; @westfall2015pangea], but the options within these packages are often limited (e.g, G\*power has limited options for within subjects factors).
 Available software solutions do not provide easy options to specify more complex designs (e.g., a 2x2x2 design, where the first factor is manipulated between participants, and the last two factors are manipulated within participants). 
-The predicted effects often need to be specified as a standardized effect size such as Cohen's f or partial eta squared ($\eta_p^2$), which are not the most intuitive way to specify a hypothesized pattern of results, and these effect sizes do not generalize to different experimental designs.
+The predicted effects often need to be specified as a standardized effect size such as Cohen's $f$ or partial eta squared ($\eta_p^2$), which are not the most intuitive way to specify a hypothesized pattern of results, and these effect sizes do not generalize to different experimental designs.
 Simulations based on a specified pattern of means and a covariance matrix (based on the expected standard deviation and correlation between within participant factors) provide a more flexible approach to power analyses. 
 However, such simulations typically require extensive programming knowledge.
 
@@ -77,13 +77,13 @@ After a short introduction to statistical power, focusing on the *F*-test, we wi
 
 # A basic example
 
-Imagine you plan to perform a study in which participants interact with an artificial voice assistant who sounds either cheerful or sad.
-You measure how much 80 participants in each condition enjoy interacting with with the voice assistant on a line marking scale (coded continuously from -5 to 5) and observe a mean of 0 in the sad condition, and a mean of 1 in the cheerful condition, with an estimated standard deviation of 2. 
+Imagine you perform a study in which participants interact with an artificial voice assistant who sounds either cheerful or sad.
+You measure how much 80 participants in each condition enjoy interacting with with the voice assistant on a line marking scale (coded continuously from -5 to 5) and observe a mean of 0 in the sad condition, and a mean of 1 in the cheerful condition, with an estimated (sample) standard deviation of 2. 
 After submitting your manuscript for publication, reviewers ask you to add a study with a neutral control condition to examine whether cheerful voices increase, or sad voices decrease enjoyment (or both).
-Depending on what the mean enjoyment in the neutral condition is, what sample size would you need to collect for a high powered test of the expected pattern of means? 
+Depending on what the mean enjoyment in the neutral condition in the population is, what sample size would you need to collect for a high powered test of the expected pattern of means? 
 A collaborator suggests to switch from a between-subject design to a within-subject design to collect data more efficiently.
 What impact will switching to a within-subject design have on the required sample size?
-The effect size in the first study is sometimes refered to as a 'medium' effect size based on the benchmarks by @cohen_statistical_1988. 
+The effect size observed in the first study is sometimes refered to as a 'medium' effect size based on the benchmarks by @cohen_statistical_1988. 
 Does it make sense to perform an a-priori power analysis for a 'medium' effect size if we add a third betwee-subject condition, or switch to a within-subject ANOVA design?
 And if you justify the sample size based on the power for the main effect for the ANOVA, will the study also have sufficient statistical power for the independent comparisons between conditions (or vice versa)?
 Before we answer these questions, let's consider some of the basic concepts of statistical power and how power calculations are typically performed.
@@ -196,7 +196,7 @@ Cohen's d, a standardized effect size, is calculated by dividing the difference 
 \begin{equation}
 d = \frac{m_1-m_2}{\sigma}.
 \end{equation}
-The generalization of Cohen's d to more than two groups is Cohen's f, which is the standard deviation of the means divided by the standard deviation (Cohen, 1988), or: 
+The generalization of Cohen's d to more than two groups is Cohen's $f$, which is the standard deviation of the means divided by the standard deviation (Cohen, 1988), or: 
 \begin{equation}
 f = \frac{\sigma _{ m }}{\sigma}
 \end{equation}
@@ -204,12 +204,12 @@ where for equal sample sizes,
 \begin{equation}
 \sigma _{ m } = \sqrt { \frac { \sum_ { i = 1 } ^ { k } ( m _ { i } - m ) ^ { 2 } } { k } }.
 \end{equation}
-For two groups Cohen's f is half as large as Cohen's d, or $f = \frac{1}{2}d$.
-Partial eta-squared, which is often used as input in power analysis software, can be converted into Cohen's f:
+For two groups Cohen's $f$ is half as large as Cohen's d, or $f = \frac{1}{2}d$.
+Partial eta-squared, which is often used as input in power analysis software, can be converted into Cohen's $f$:
 \begin{equation}
 f = \sqrt{\frac{\eta_p^2}{1-\eta_p^2}} \label{eq:eta-to-f}
 \end{equation}
-and Cohen's f can be converted into partial eta-squared:
+and Cohen's $f$ can be converted into partial eta-squared:
 \begin{equation}
 \eta_p^2 = \sqrt{\frac{f^2}{f^2+1}} \label{eq:f-to-eta}
 \end{equation}
@@ -218,21 +218,21 @@ In a between-participants one-way ANOVA lambda is calculated as:
 \begin{equation}
 \lambda = f^2 \times N \label{eq:lambda}
 \end{equation}
-where f is Cohen's f and N is the total sample size. 
+where f is Cohen's $f$ and N is the total sample size. 
 \end{tcolorbox}
 
 # Simulating Statistical Power for Different Factorial Designs
 
 Superpower can be used in R or in an online Shiny app. 
 The code underlying the Superpower R package and the Shiny app generates data for each condition in the design and performs an ANOVA and *t*-tests for all comparisons between conditions.
-The ANOVA_exact function simulates one function that has exactly the desired statistical properties, and computes power directly from the test results on this perfect dataset.
+The ANOVA_exact function simulates an "exact" dataset that has exactly the desired statistical properties, and computes power directly from the test results on this perfect dataset.
 The ANOVA_power function simulates datasets repeatedly based on the specified parameters and calculates the percentage of statistically significant results. 
 The simulation can be performed based on any design specified using the ANOVA_design function, the result of which is stored and passed on to either of the two functions to compute power. 
 Users specify the design based on the number of levels for each factor (e.g., 2) and whether the factor is manipulated within or between participants (be entering a 'w' or a 'b'). 
-Superpower can handle up to three factors (seperated by '*'). 
-A 2b design means a single factor with two groups manipulated between participants, whereas a 2b*2w design is a 2 x 2 mixed ANOVA where the first factor is manipulated between, and the second within participants. 
-Users alpso specify the sample size per group (n), the predicted pattern of means across all conditions, the expected standard deviation, and the correlation between variables (for within designs).
-To make it easier to interpret the output users can specify factor names and names for each factor level (e.g., 'condition, cheerful, sad').
+Superpower can handle up to three factors (seperated by '\*'). 
+A 2b design means a single factor with two groups manipulated between participants, whereas a 2b\*2w design is a 2 x 2 mixed ANOVA where the first factor is manipulated between, and the second within participants. 
+Users also specify the sample size per group (n), the predicted pattern of means across all conditions, the expected standard deviation, and the correlation between variables (for within designs).
+To make it easier to interpret the output users can specify factor names and names for each factor level (e.g., "condition, cheerful, sad").
 Detailed examples for a wide range of designs are available in an online manual at http://arcaldwell49.github.io/SuperpowerBook. 
 
 An example of the R code is: 
@@ -248,7 +248,7 @@ design_result <- ANOVA_design(
 
 An example of the input in the Shiny app is:
 
-```{r, scr2, fig.cap="Screenshot of ANOVA powerShiny app"}
+```{r, scr2, fig.cap="Screenshot of ANOVA_power Shiny app"}
 knitr::include_graphics("screenshots/anova_power.png")
 ```
 
@@ -283,13 +283,13 @@ power_result_exact <- ANOVA_exact(design_result)
 ```
 
 The first approach is a bit more flexible (e.g., it allows for sequential corrections for multiple comparisons such as the Holm procedure), but the second approach is much faster (and generally recommended).
-Because the true pattern of the data are unknown in an a-priori power analysis, there is often uncertainty about the values that need to be entered in a power analysis. 
+There is often uncertainty about the values that need to be entered a-priori power analysis because the true (population-level) pattern of the data are unknown. 
 It makes sense to examine power across a range of assumptions, from more optimistic scenarios, to more conservative estimates.
 In many cases researchers should consider collecting a sample size that guarantees sufficient power for the smallest effect size of interest, instead of the effect size they expect (for examples, see @lakens_equivalence_2018).
-This guarantees the study will yield an informative answer, even when there is uncertainty about the true effect size.
+This approach ensures the study can be informative, even when there is uncertainty about the true effect size.
 If ANOVA_power is used the results from the simulation will vary each time the simulation is performed (unless a seed is specified,  e.g., `set.seed = 2019'). 
 A user should specify the number of simulations (the more simulations, the more accurate the results are,, but the longer the simulation takes), the alpha level for the tests, and any adjustments for multiple comparisons that are required.
-The output from ANOVA_exact and ANOVA_power is similar, and provides the statistical power for the ANOVA and all simple comparisons between conditions.
+The output from ANOVA_exact and ANOVA_power are similar, and provides the statistical power for the ANOVA and all simple comparisons between conditions.
 
 ```
 Power and Effect sizes for ANOVA tests
@@ -301,7 +301,7 @@ Power and Effect sizes for pairwise comparisons (t-tests)
 p_condition_cheerful_condition_sad    88.191     -0.5017
 ```
 
-The same results are returned in the onine Shiny app, but here users can also choose a 'download PDF report' option to receive the results as a PDF file that can be saved to be included in a preregistration. 
+The same results are returned in the onine Shiny app, but here users can also choose a 'download PDF report' option to receive the results as a PDF file that can be saved to be included as documentation for sample size requirements (e.g., preregistrations, Registered Reports, or grant applications). 
 
 ![Screenshot of the results of the power analysis in the ANOVA_power Shiny app.](screenshots/anova_power_result.png)
 
@@ -312,7 +312,7 @@ Since there are only two groups in this example, the statistical power for the i
 Now that the basic idea behind power analyses in Superpower is illustrated, we can use it to explore how changes to the experimental design influence power, and answer some of the questions our hypothetical researcher is confronted with when designing a follow-up study.
 We will first examine what happens if we add a third, neutral, condition to the design.
 Let's assume a researcher expects the mean enjoyment rating for the neutral voice condition to fall either perfectly between the cheerful and sad conditions, or to be equal to the cheerful condition.
-The researcher wonders if simply collecting 80 additional participants in  the neutral condition is sufficient to find a significant effect in the One-Way ANOVA. 
+The researcher wonders if simply collecting 80 additional participants in the neutral condition is enough for a one-way ANOVA to have sufficient power. 
 The R code to specify this design is:
 
 ```{r eval=F, echo=T}
@@ -378,34 +378,39 @@ If we assume the mean is equal to the cheerful condition, the power increases to
 Compared to the two group design (where the power was `r round(power_result$main_results$power[1],2)`%), three things have changed. 
 First, the numerator degrees of freedom has increased because an additional group is added to the design, which makes the non-central *F*-distribution more similar to the central *F*-distribution, which reduces the statistical power. 
 Second, the total sample size is 50% larger after adding 80 participants in the third condition, which increases the statistical power of the ANOVA.
-Third, the effect size, Cohen's f, has decreased from `r power_oneway_between(design_result)$Cohen_f` to either `r round(power_oneway_between(design_result_1)$Cohen_f,4)` or `r round(power_oneway_between(design_result_2)$Cohen_f,4)`, which reduces the statistical power.
+Third, the effect size, Cohen's $f$, has decreased from `r power_oneway_between(design_result)$Cohen_f` to either `r round(power_oneway_between(design_result_1)$Cohen_f,4)` or `r round(power_oneway_between(design_result_2)$Cohen_f,4)`, which reduces the statistical power.
 The most important take-home message is that changing an experimental design can have several opposing effects on the power of a study, depending of the pattern of means. 
-The exact effect of these three changes on the statistical power is difficult to anticipate from one ANOVA design to the next. 
-This highlights the importance of performing an a-priori power analysis based on a specific pattern of means that you predict.
+The exact effect of these three changes on the statistical power is difficult to anticipate from one design to the next. 
+This highlights the importance of performing an a-priori power analysis based on a specific pattern of means that your theory or hypotheses predict.
 
-Although an initial goal when performing an ANOVA might be to test the *omnibus null hypothesis*, which answers the question whether there are *any* differences between group means, we often want to know which conditions differ from each other.
+Although an initial goal when might be to test the *omnibus null hypothesis* (i.e., ANOVA), which answers the question whether there are *any* differences between group means, we often want to know which *specific* conditions differ from each other.
 Thus, an ANOVA is often followed up by individual comparisons (whether *planned* or *post-hoc*).
 Superpower automatically provides the statistical power for all individual comparisons that can be performed.
 By default, the power and effect size estimates are based on simple *t*-tests. 
 It is also possible to combine variance estimates from all conditions and calculate the estimated marginal means [@lenthemmeans] when performing individual comparisons by setting `emm = TRUE` within the ANOVA_power or ANOVA_exact functions, or checking this option in the Shiny app.
-Doing so can have power benefits [@maxwell_designing_2017], depending on whether the assumption of equal variances (also known as the homogeneity assumption) is met, which may not be warranted in psychological research [@delacre_why_2018]. 
+This approach is often has greater statistical power [@maxwell_designing_2017], depending on whether the assumption of equal variances (also known as the homogeneity assumption) is met, which may not be warranted in psychological research [@delacre_why_2018]. 
 The degree to which violations of the homogeneity assumption affect Type 1 error rates can be estimated with the ANOVA_power function (see Assumptions section below).
 Power analysis for individual comparisons is relatively straightforward and can easily be done in all power analysis software, but providing power for all individual comparisons alongside the ANOVA result by default hopefully nudges researchers to take into account the power for follow-up tests.
-Depending on the pattern of means in the three conditions, we are interested in the statistical power for a mean difference of 0.5, or a mean difference of 1. 
 
-When performing multiple individual comparisons, we need to choose the alpha level such that we prevent an inflated Type 1 error rate. 
+```{r eval=FALSE, include=FALSE}
+#Daniel deleted this line of text because it seems out of place
+#Depending on the pattern of means in the three conditions, we are interested in the statistical power for a mean difference of 0.5, or a mean difference of 1. 
+```
+
+
+When performing multiple individual comparisons, we need to choose the alpha level and ensure the Type 1 error rate is not inflated. 
 By adjusting for multiple comparisons we ensure that we do not conclude there is an effect in *any* of the individual tests more often than the desired Type 1 error rate.
-Several techniques to control error rates exist, of which the best known is the Bonferroni adjustment.
-The Holm procedure is slightly more powerful than the Bonferroni adjustment, without requiring additional assumptions [for other approaches, see @bretz_multiple_2011].
-Power analyses using a manually calculated Bonferoni correction can be performed with the ANOVA_exact function by specifying the adjusted alpha level, but the sequential Holm appraoch can only be performed in the ANOVA_power simulation approach.
+Several techniques to control error rates exist, of which the best known is the Bonferroni correction.
+The Holm procedure is slightly more powerful than the Bonferroni correction, without requiring additional assumptions [for other approaches, see @bretz_multiple_2011].
+Power analyses using a manually calculated Bonferoni correction can be performed with the ANOVA_exact function by specifying the adjusted alpha level, but the sequential Holm approach can only be performed in the ANOVA_power simulation approach.
 Because the adjustment for multiple comparisons lowers the alpha level, it also lowers the statistical power.
 For the paired comparisons we see we have approximately `r round(power_result_2_holm$pc_results$power[2],0)`% power for differences of 0.5 after controlling for multiple comparisons with the Holm procedure (compared to `r round(power_result_2$pc_results$power[2],0)`% power without correcting for multiple comparisons).
 As the number of possible paired comparisons increases, the alpha level is reduced, and power becomes lower, all else equal.
 These power analyses reveal the cost (in terms of the statistical power) of exploring across all possible paired comparisons while controlling error rates.
 To maintain an adequate level of power after lowering the alpha level to control the Type 1 error rate after multiple comparisons the sample size should be increased.
-In a One-Way ANOVA multiple comparisons are only an issue for the follow-up comparison, but in a 2x2x2 design, an ANOVA will give the test results for three main effects, three two-way interactions, and one three-way interaction. 
+In a one-way ANOVA multiple comparisons are only an issue for the follow-up comparison, but in a 2x2x2 design, an ANOVA will give the test results for three main effects, three two-way interactions, and one three-way interaction. 
 Because seven statistical tests are performed, the probability of making at least one Type 1 error in a single exploratory 2x2x2 ANOVA is $1-(0.95)^7$ = 30%.
-It is therefore also important to control error rates in exploratory ANOVA's [@cramer_hidden_2016].
+It is therefore important to control error rates in exploratory ANOVA's [@cramer_hidden_2016].
 If a researcher is only interested in specific tests it is advisable to preregister and test only these comparisons instead of correcting the alpha level for all possible comparisons [@haans_contrast_2018].
 
 # Power for Within-Subject Designs
@@ -472,18 +477,18 @@ exact_result_within_1 <- ANOVA_exact(design_result_within_1)
 Revisiting our between-participant design, power was `r power_result_1$main_results$power`% when the enjoyment scores were uncorrelated.
 The power for a repeated-measures ANOVA based on these values, where ratings for the three conditions are collected from 80 participants, is `r power_result_within_1$main_results$power`%.
 Because of the positive correlation between dependent variables, the effect size $\eta_p^2$ is much larger for the within-subject design ($\eta_p^2$ = `r power_result_within_1$main_results$effect_size`) than for the 3 group between participants design ($\eta_p^2$ = `r power_result_1$main_results$effect_size`), and a researcher might deside to collect somewhat less participants, while staying having a sufficiently low Type 2 error rate. 
-As explained in Box 2 G*Power by default uses a different calculation for $\eta_p^2$ which does not depend on the correlation. 
+As explained in Box 2 G\*Power by default uses a different calculation for $\eta_p^2$ which does not depend on the correlation. 
 This default often leads to errors for power analyses that include within-subject factors when researchers perform a power analysis on an effect size reported in the published literature.
-The Superpower package allows researchers to enter a correlation matrix that specifies the expected population correlation for each pair of measurements, instead of entering a single correlation as in the example above.
+The Superpower package allows researchers to enter a correlation matrix that specifies the expected population correlation for each pair of measurements (i.e., correlation matrix), instead of entering a single correlation as in the example above.
 
 \begin{tcolorbox}[colback=black!5!white,colframe=white!5!black,title=Box 2. Formula for effect sizes for within designs]
-The effect size in a within-design is referred to as Cohen's $d_z$ (because it is the effect size of the difference score between *x* and *y*, *z*). The relation is:
+The effect size in a within-design is referred to as Cohen's $d_z$ (because it is the effect size of the difference score between \textit{x} and \textit{y}, yielding \textit{{z}). The relation is:
 \begin{equation}
 \sigma_{z}=\sigma\sqrt{2(1-\rho)}
 \end{equation}
-Cohen's $d_z$ is used in power analyses for dependent *t*-tests, but there is no equivalent Cohen's $f_z$ for a within-participant ANOVA, and Cohen's f is identical for within and between designs. 
+Cohen's $d_z$ is used in power analyses for dependent $t$-tests, but there is no equivalent Cohen's $f_z$ for a within-participant ANOVA, and Cohen's $f$ is identical for within and between designs. 
 Instead, the value for lambda ($\lambda$) is adjusted based on the correlation. 
-For a one-way within-participant design lambda is identical to Equation \@ref(eq:lambda), multiplied by *u*, a correction for within-subject designs, calculated as:
+For a one-way within-participant design lambda is identical to Equation \@ref(eq:lambda), multiplied by \textit{u}, a correction for within-subject designs, calculated as:
 \begin{equation}
 u = \frac{k}{1-\rho}
 \end{equation}
@@ -491,7 +496,7 @@ where $k$ is the number of levels of the within-participant factor, and $\rho$ i
 Equations 4 and 5 no longer hold when measurements are correlated.
 The default settings in G\*Power expects an f or $\eta_p^2$ that does not incorporate the correlation, while the correlation is incorporated in the output of software packages such as SPSS. 
 One can  enter the $\eta_p^2$ from SPSS output in G\*Power after checking the 'as in SPSS' checkbox in the options window, but forgetting this is a common mistake in power analyses for within designs in G\*Power.
-For a one-way within-subject design, Cohen's f can be converted into the Cohen's f SPSS uses through:
+For a one-way within-subject design, Cohen's $f$ can be converted into the Cohen's $f$ SPSS uses through:
 \begin{equation}
 f^2_{SPSS} = f^2 \times \frac{k}{k-1} \times \frac{n}{n-1} \times \frac{1}{1-\rho}
 \end{equation}
@@ -501,11 +506,11 @@ and subsequently tranformed to $\eta_p^2$ through Equation 5.
 # Power for Interactions
 
 So far we have explored power analyses for one factor designs.
-Superpower can easily provide statistical power for designs with up to three factors of up to 999 levels (e.g., a 4b*2w2w would specify a mixed design with two within factors which 2 levels, and one between factor with 4 levels).
+Superpower can easily provide statistical power for designs with up to three factors of up to 999 levels (e.g., a 4b\*2w\*2w would specify a mixed design with two within factors which 2 levels, and one between factor with 4 levels).
 Let's assume the researcher plans to perform a follow-up experiment where in addition to making the voice sound cheerful or sad, a second factor is introduced by making the voice sound more robotic compared to the default human-like voice. 
 Different patterns of results could be expected in this 2 by 2 design that lead to interactions.
 Either no effect is observed for robotic voices, or the opposite effect is observed for robotic voices (we enjoy a sad robotic voice more than a cheerful one, a 'Marvin-the-Depressed-Robot Effect'). 
-We specify the pattern of means as `(1, 0, 0, 0) for the ordinal interactions, or as `(1, 0, 0, 1)` for the cross-over (or disordinal) interaction, as illustrated below (see Figure \ref{fig:mean-plot} for the expected pattern of means).
+We specify the pattern of means as `(1, 0, 0, 0)` for the ordinal interactions, or as `(1, 0, 0, 1)` for the cross-over (or disordinal) interaction, as illustrated below (see Figure \ref{fig:mean-plot} for the expected pattern of means).
 
 ```{r eval=F, echo=T}
 design_result_cross_80 <- ANOVA_design(
@@ -542,23 +547,23 @@ design_result_cross_40 <- ANOVA_design(design = "2b*2b", n = 40, mu = c(1, 0, 0,
 Mathematically the interaction effect is computed as the cell mean minus the sum of the grand mean, the marginal mean in each condition of one factor minus the grand mean, and the marginal mean in each condition for the other factor minus grand mean (see Maxwell et al., 2017). For example, for the cheerful human-like voice condition in the cross-over interaction this is 1 (the value in the cell) - (0.5 [the grand mean] + 0 [the marginal mean of cheerful voices minus the grand mean of 0.5] + 0 [the marginal mean of human-like voices minus the grand mean of 0.5]). 
 Thus, 1 - (0.5 + 0 + 0) = 0.5.
 Completing this for all four cells for the cross-over interaction gives the values 0.5, -0.5, -0.5, 0.5.
-Cohen's f is then $f = \frac { \sqrt { \frac { 0.5^2 +-0.5^2 + -0.5^2 + -0.5^2 } { 4 } }}{ 2 } = 0.25$.
+Cohen's $f$ is then $f = \frac { \sqrt { \frac { 0.5^2 +-0.5^2 + -0.5^2 + -0.5^2 } { 4 } }}{ 2 } = 0.25$.
 For the ordinal interaction the grand mean is (1+0+0+0)/4, or 0.25.
-Completing the calculation for all four cells for the ordinal interaction gives the values 0.25, -0.25, -0.25, 0.25, and a Cohen's f of 0.125. 
+Completing the calculation for all four cells for the ordinal interaction gives the values 0.25, -0.25, -0.25, 0.25, and a Cohen's $f$ of 0.125. 
 We see the effect size of the cross-over interaction is twice as large as the effect size of the ordinal interaction. 
 Had we predicted a pattern of means of 2, 0, 0, 0, then the effect size for the ordinal interation would have been f = 0.25. 
 The take-home message is that a 'medium' effect size (f = 0.25) translates into a much more extreme pattern of means in an ordinal interaction than in a disordinal (crossover) interaction, or in a 2x2x2 interaction compared to a 2x2 interaction (see also Perugini et al. (2018)).
-It might therefore be more intuitive to perform a power analysis based on the expected pattern of means, than to perform a power analyses based on Cohen's f or $\eta_p^2$.
+It might therefore be more intuitive to perform a power analysis based on the expected pattern of means, than to perform a power analyses based on Cohen's $f$ or $\eta_p^2$.
 \end{tcolorbox}
 
 Simulations (using either the ANOVA_power or ANOVA_exact functions) show we have `r power_result_cross_80$main_results$power[3]`% power for the cross-over interaction when we collect 80 participants per condition, and `r power_result_ordinal_80$main_results$power[3]`% power for the ordinal interaction.
-For comparison, the power for the simple effect corresponding to One-Way ANOVA example we started with is `r power_result_cross_80$pc_results$power[1]`%.
+For comparison, the power for the simple effect corresponding to one-way ANOVA example we started with is `r power_result_cross_80$pc_results$power[1]`%.
 The cross-over interaction has much higher statistical power than the ordinal interaction because the effect size is twice as large, as explained in Box 3.
-The cross-over interaction also has more statistical power than the simple comparison, even thought the effect size is identical (Cohen's f = 0.25) because the sample size has doubled.
+The cross-over interaction also has more statistical power than the simple comparison, even though the effect size is identical (Cohen's $f$ = 0.25) because the sample size has doubled.
 The interaction effect can be contrast coded as 1, -1, -1, 1, and thus tests the scores of 160 participants in the cheerful human and sad robot conditions against the scores of 160 participants in the cheerful robot and sad human conditions.
 The key insight here is that not the sample size per condition, but the pooled sample size across conditions compared in a contrast that determines the power for the main effects and the interaction [cf. @westfall_think_2015].
 
-Superpower also allows users to plot the statistical power across a range of sample sizes for the ANOVA-exact function (when using the ANOVA_power function, users will need to steadily increase or decrease the sample size in their simulations). 
+Superpower also allows users to plot the statistical power across a range of sample sizes for the ANOVA_exact function (when using the ANOVA_power function, users will need to steadily increase or decrease the sample size in their simulations). 
 This allows us to take a look at the statistical power the design has across a range of effects size.
 The code below plots the power from 10 participants per condition to 100 participants per condition for the ordinal interaction (see Figure \ref{fig:power-plot}).
 
@@ -584,7 +589,7 @@ ggplot(data=plot_data, aes(x = n, y = plot_data[,4])) +
 
 ```
 
-The plot shows that with n = 40 per group, the ordinal interaction has the same statistical power as the One-Way ANOVA example we started with, revealing that a Cohen's f = 0.25 with 40 participants in each of four conditions leads to the same power as having 80 participant in each condition. 
+The plot shows that with n = 40 per group, the ordinal interaction has the same statistical power as the one-way ANOVA example we started with, revealing that a Cohen's $f$ = 0.25 with 40 participants in each of four conditions leads to the same power as having 80 participant in each condition. 
 We also see that the cross-over interaction has the same power with 20 participants per cell as the ordinal interaction with 80 participants per cell. 
 When the effect size is halved, the required sample size to maintain the same statistical power almost quadruples [@giner-sorolla_powering_2018; @simonsohn_no-way_2014].
 
@@ -592,12 +597,12 @@ When the effect size is halved, the required sample size to maintain the same st
 
 So far in manuscript we have shown how simulations can be useful for power analyses for ANOVA designs where all assumptions of the statistical tests are met.
 An ANOVA is quite robust against violations of the normality assumption, which means the Type 1 error rate remains close to the alpha level specified in the test. Violations of the homogeneity of variances assumption can be more impactful, especially when sample sizes are unequal between conditions.
-When the equal variances assumption is violated for a One-Way ANOVA Welch's *F*-test is a good default.
-When the sphericity assumption in within designs is violated (when the variances of the differences between all pairs are not equal) a non-sphericity correction can be applied (e.g., the Greenhouse-Geisser or Huynh-Feldt correction) or a Multivariate ANOVA (MANOVA) can be performed.
+When the equal variances assumption is violated for a one-way ANOVA Welch's *F*-test is a good default.
+When the sphericity assumption in within designs is violated (when the variances of the differences between all pairs are not equal) a sphericity correction can be applied (e.g., the Greenhouse-Geisser or Huynh-Feldt correction) or a Multivariate ANOVA (MANOVA) can be performed.
 Alternative approaches for ANOVA designs with multiple between factors exist, such as heteroskedasticity robust standard errors.
-Superpower allows researchers to perform power analyses for unequal variances by performing Welch' *F*-test or by applying Greenhouse-Geisser or Huynh-Feldt corrections or a MANOVA.
+Superpower allows researchers to perform power analyses for unequal variances (or correlations) by performing Welch' *F*-test, appying sphercity corrections, or a MANOVA.
 
-Although some recommendations have been provided to assist researchers to choose an approach to deal with violations of the homogeneity assumption [@algina_detecting_1997], it is often unclear how consequential violations of the homogeneity assumption are. 
+Although some recommendations have been provided to assist researchers to choose an approach to deal with violations of the homogeneity assumption [@algina_detecting_1997], it is often unclear if these violations of the homogeneity assumption are consequential for a given study. 
 So far we have used simulations in Superpower to simulate patterns of means where there is a true effect, but we can also simulate a null effect.
 Such Monte Carlo simulation studies are used in published articles to examine the Type 1 error rate under a range of assumptions and while performing different tests.
 Superpower makes it easy to perform such simulations studies for the specific scenario a researcher is faced with, and can help to make a decision whether violations of assumptions are something to worry about, and whether choices to deal with violations are sufficient.
@@ -662,11 +667,12 @@ If this is achieved, the Type 1 error rate it reduced to `r power_result_violati
 
 # Conclusion
 
-It is important to justify the sample size when designing studies.
-Power analyses for more complex ANOVA designs typically required programming knowledge.
+It is important to justify the sample size when designing a study.
+Power analyses for more complex ANOVA designs have typically required programming knowledge.
+The R package, guide book,  and Shiny apps (see https://arcaldwell49.github.io/SuperpowerBook) that accompany this tutorial enable researchers to perform simulations for factorial experiments of up to three factors and any number of levels, making it easy to perform simulation-based power analysis without extensive programming experience.
 Exploring the power for designs with specific patterns of means, standard deviations, and correlations between variables can be used to choose a design and sample size that provides the highest statistical power for future studies.
 Simulation based approaches can also help to provide a better understanding of the factors that influence the statistical power for factorial ANOVA designs, or the impact of violations of assumptions on the Type 1 error rate. 
-The R package, guide book,  and Shiny apps (see https://arcaldwell49.github.io/SuperpowerBook) that accompany this tutorial enable researchers to perform simulations for factorial experiments of up to three factors and any number of levels, making it easy to perform simulation-based power analysis without extensive programming experience.
+
 
 ## Author Contributions
 
@@ -682,7 +688,7 @@ Aaron R. Caldwell ![](screenshots/orcid.png) https://orcid.org/0000-0002-4541-62
 Many improvements to Superpower are based on feedback from Lisa DeBruine and the sim_design function in her 'faux' R package. The ANOVA_exact function was inspired by Chris Aberson's pwr2ppl package. We are grateful to Jonathon Love for proposing the name 'Superpower' and the development of a jamovi module.
 
 ## Declaration of Conflicting Interests
-The opinions or assertions contained herein are the private views of the author(s) and are not to be construed as official or reflecting the views of the Army or the Department of Defense. Any citations of commercial organizations and trade names in this report do not constitute an official Department of the Army endorsement of approval of the products or services of these organizations. No authors have any conflicts of interest to disclose. Approved for public release; distribution is unlimited. The author(s) declared that there were no conflicts of interest with respect to the authorship or the publication of this article. 
+The opinions or assertions contained herein are the private views of the author(s) and are not to be construed as official or reflecting the views of the Army or the Department of Defense. Any citations of commercial organizations and trade names in this report do not constitute an official Department of the Army endorsement of approval of the products or services of these organizations. Approved for public release; distribution is unlimited. The author(s) declared that there were no conflicts of interest with respect to the authorship or the publication of this article. 
 
 ## Funding
 This work was funded by VIDI Grant 452-17-013 from the Netherlands Organisation for Scientific Research.
