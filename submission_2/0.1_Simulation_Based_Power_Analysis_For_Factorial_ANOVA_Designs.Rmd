@@ -253,7 +253,6 @@ An example of the input in the Shiny app is:
 
 ![Screenshot of ANOVA_power Shiny app.](screenshots/anova_power.png)
 
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 design_result <- ANOVA_design(design = "2b", n = 80, mu = c(1, 0), sd = 2, labelnames = c("condition", "cheerful", "sad"))
 set.seed(manuscript_seed)
@@ -403,11 +402,6 @@ It is also possible to combine variance estimates from all conditions and calcul
 This approach is often has greater statistical power [@maxwell_designing_2017], depending on whether the assumption of equal variances (also known as the homogeneity assumption) is met, which may not be warranted in psychological research [@delacre_why_2018]. 
 The degree to which violations of the homogeneity assumption affect Type 1 error rates can be estimated with the ANOVA_power function (see Assumptions section below).
 Power analysis for individual comparisons is relatively straightforward and can easily be done in all power analysis software, but providing power for all individual comparisons alongside the ANOVA result by default hopefully nudges researchers to take into account the power for follow-up tests.
-
-```{r eval=FALSE, include=FALSE}
-#Daniel deleted this line of text because it seems out of place
-#Depending on the pattern of means in the three conditions, we are interested in the statistical power for a mean difference of 0.5, or a mean difference of 1. 
-```
 
 When performing multiple individual comparisons, we need to choose the alpha level and ensure the Type 1 error rate is not inflated. 
 By adjusting for multiple comparisons we ensure that we do not conclude there is an effect in *any* of the individual tests more often than the desired Type 1 error rate.
