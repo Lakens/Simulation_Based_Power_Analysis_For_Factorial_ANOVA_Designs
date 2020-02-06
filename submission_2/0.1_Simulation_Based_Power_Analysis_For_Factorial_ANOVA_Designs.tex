@@ -1,5 +1,4 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
@@ -10,13 +9,13 @@
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
-% Use upquote if available, for straight quotes in verbatim environments
+% use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \IfFileExists{microtype.sty}{% use microtype if available
   \usepackage[]{microtype}
@@ -39,9 +38,9 @@
   pdftitle={Simulation-Based Power-Analysis for Factorial ANOVA Designs},
   pdfauthor={Daniël Lakens~\& Aaron R. Caldwell},
   pdfkeywords={power analysis, ANOVA, hypothesis test, sample size justification, repeated measures},
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
+  pdfborder={0 0 0},
+  breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
 \usepackage{color}
 \usepackage{fancyvrb}
 \newcommand{\VerbBar}{|}
@@ -91,14 +90,25 @@
 % margins by default, and it is still possible to overwrite the defaults
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
-% Set default figure placement to htbp
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-2}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
 \shorttitle{Superpower}
 \affiliation{
 \vspace{0.5cm}
@@ -161,7 +171,7 @@ Compared to G*power, the pwr R package, and the pwr2ppl R package, Superpower ca
 Compared to PANGEA, G*power, and MorePower, we believe the required input is somewhat more intuitive, as users enter means, standard deviations, and correlations, instead of effect sizes and variance components.
 A unique feature of Superpower is that it allows users to easily correct for multiple comparisons in exploratory ANOVA designs, and that it automatically provides the statistical power for all main effects, interactions, and simple comparisons for a specified ANOVA design.
 The online manual at \url{http://arcaldwell49.github.io/SuperpowerBook} provides detailed examples for power analyses for One-Way ANOVA designs up to three-way interactions for mixed designs, MANOVA analyses, and power analyses for when ANOVA assumptions are violated, as well as examples validating power analyses in Superpower against existing software.
-Two limitations of the current version of Superpower is that it does not compute power for ANCOVA or linear mixed model designs.
+Two limitations of the current version of Superpower is that it currently cannot compute power for ANCOVAs or linear mixed models.
 Superpower allows researchers to perform simulation-based power analyses, without having extensive programming knowledge, by specifying a pattern of means and a covariance matrix (based on the expected standard deviation and correlation between within participant factors).
 By simulating data for factorial designs with specific parameters researchers can gain a better understanding of the factors that determine the statistical power of an ANOVA, and learn how to design well-powered experiments.
 After a short introduction to statistical power, focusing on the \emph{F}-test, we will illustrate through simulations how the power of factorial ANOVA designs depend on the pattern of means across conditions, the number of factors and levels, the sample size, and whether you need to control the alpha level for multiple comparisons.
@@ -228,7 +238,8 @@ An example of the R code is:
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{design_result <-}\StringTok{ }\KeywordTok{ANOVA_design}\NormalTok{(}
-  \DataTypeTok{design =} \StringTok{"2b"}\NormalTok{, }\DataTypeTok{n =} \DecValTok{80}\NormalTok{, }\DataTypeTok{mu =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DataTypeTok{sd =} \DecValTok{2}\NormalTok{,}
+  \DataTypeTok{design =} \StringTok{"2b"}\NormalTok{, }\DataTypeTok{n =} \DecValTok{80}\NormalTok{, }\DataTypeTok{mu =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }
+  \DataTypeTok{sd =} \DecValTok{2}\NormalTok{,}
   \DataTypeTok{labelnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"condition"}\NormalTok{, }
                  \StringTok{"cheerful"}\NormalTok{, }\StringTok{"sad"}\NormalTok{))}
 \end{Highlighting}
@@ -257,7 +268,7 @@ and Cohen's $f$ can be converted into partial eta-squared:
 \begin{equation}
 \eta_p^2 = \sqrt{\frac{f^2}{f^2+1}} \label{eq:f-to-eta}
 \end{equation}
-Power calculations rely on the noncentrality parameter (lambda, ($\lambda$).) 
+Power calculations rely on the noncentrality parameter (lambda, $\lambda$).
 In a between-participants one-way ANOVA lambda is calculated as:
 \begin{equation}
 \lambda = f^2 \times N \label{eq:lambda}
@@ -295,10 +306,10 @@ The second is to simulate a dataset that has \emph{exactly} the desired properti
 The first approach is a bit more flexible (e.g., it allows for sequential corrections for multiple comparisons such as the Holm procedure), but the second approach is much faster (and generally recommended).
 There is often uncertainty about the values that need to be entered a-priori power analysis because the true (population-level) pattern of the data are unknown.
 It makes sense to examine power across a range of assumptions, from more optimistic scenarios, to more conservative estimates.
-In many cases researchers should consider collecting a sample size that guarantees sufficient power for the smallest effect size of interest, instead of the effect size they expect (for examples, see Lakens, Scheel, and Isager (2018)).
+In many cases researchers should consider collecting a sample size that guarantees sufficient power for the smallest effect size of interest, instead of the effect size they expect (for examples, see Lakens, Scheel, \& Isager (2018)).
 This approach ensures the study can be informative, even when there is uncertainty about the true effect size.
 If ANOVA\_power is used the results from the simulation will vary each time the simulation is performed (unless a seed is specified, e.g., `set.seed = 2019').
-A user should specify the number of simulations (the more simulations, the more accurate the results are,, but the longer the simulation takes), the alpha level for the tests, and any adjustments for multiple comparisons that are required.
+A user should specify the number of simulations (the more simulations, the more accurate the results are, but the longer the simulation takes), the alpha level for the tests, and any adjustments for multiple comparisons that are required.
 The output from ANOVA\_exact and ANOVA\_power are similar, and provides the statistical power for the ANOVA and all simple comparisons between conditions.
 
 \begin{verbatim}
@@ -336,7 +347,8 @@ The R code to specify this design is:
   \DataTypeTok{design =} \StringTok{"3b"}\NormalTok{, }\DataTypeTok{n =} \DecValTok{80}\NormalTok{, }
   \DataTypeTok{mu =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DataTypeTok{sd =} \DecValTok{2}\NormalTok{, }
   \DataTypeTok{labelnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"condition"}\NormalTok{, }
-                 \StringTok{"cheerful"}\NormalTok{, }\StringTok{"neutral"}\NormalTok{, }\StringTok{"sad"}\NormalTok{))}
+                 \StringTok{"cheerful"}\NormalTok{, }
+                 \StringTok{"neutral"}\NormalTok{, }\StringTok{"sad"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -375,9 +387,9 @@ When performing multiple individual comparisons, we need to choose the alpha lev
 By adjusting for multiple comparisons we ensure that we do not conclude there is an effect in \emph{any} of the individual tests more often than the desired Type 1 error rate.
 Several techniques to control error rates exist, of which the best known is the Bonferroni correction.
 The Holm procedure is slightly more powerful than the Bonferroni correction, without requiring additional assumptions (for other approaches, see Bretz, Hothorn, \& Westfall, 2011).
-Power analyses using a manually calculated Bonferoni correction can be performed with the ANOVA\_exact function by specifying the adjusted alpha level, but the sequential Holm approach can only be performed in the ANOVA\_power simulation approach.
+Power analyses using a manually calculated Bonferroni correction can be performed with the ANOVA\_exact function by specifying the adjusted alpha level, but the sequential Holm approach can only be performed in the ANOVA\_power simulation approach.
 Because the adjustment for multiple comparisons lowers the alpha level, it also lowers the statistical power.
-For the paired comparisons we see we have approximately 78\% power for the expected difference between the cheerful and sad conditions after controlling for multiple comparisons with the Holm procedure (compared to 88\% power without correcting for multiple comparisons), and only 26\% and 26\% power when comparing cheerful and sad conditions with the neutral condition.
+For the paired comparisons we see we have approximately 78\% power for the expected difference between the cheerful and sad conditions after controlling for multiple comparisons with the Holm procedure (compared to 88\% power without correcting for multiple comparisons), and only 26\% and 26\% power when comparing cheerful and sad conditions with the neutral condition, respectively.
 As the number of possible paired comparisons increases, the alpha level is reduced, and power is reduced, all else equal.
 These power analyses reveal the cost (in terms of the statistical power) of exploring across all possible paired comparisons while controlling error rates.
 To maintain an adequate level of power after lowering the alpha level to control the Type 1 error rate after multiple comparisons the sample size should be increased.
@@ -403,7 +415,8 @@ Note the design has changed from \texttt{3b} (a one factor between design with t
   \DataTypeTok{design =} \StringTok{"3w"}\NormalTok{, }\DataTypeTok{n =} \DecValTok{80}\NormalTok{, }\DataTypeTok{mu =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\DecValTok{0}\NormalTok{), }
   \DataTypeTok{sd =} \DecValTok{2}\NormalTok{, }\DataTypeTok{r =} \FloatTok{0.5}\NormalTok{,}
   \DataTypeTok{labelnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"condition"}\NormalTok{, }
-                 \StringTok{"cheerful"}\NormalTok{, }\StringTok{"neutral"}\NormalTok{, }\StringTok{"sad"}\NormalTok{)}
+                 \StringTok{"cheerful"}\NormalTok{, }
+                 \StringTok{"neutral"}\NormalTok{, }\StringTok{"sad"}\NormalTok{)}
 \NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -421,16 +434,16 @@ We can perform the simulation-based power analysis with the \texttt{ANOVA\_power
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{power_within_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\KeywordTok{ANOVA_power}\NormalTok{(design_within_}\DecValTok{1}\NormalTok{, }
-                              \DataTypeTok{nsims =} \DecValTok{100000}\NormalTok{)}
-\NormalTok{exact_within_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\KeywordTok{ANOVA_exact}\NormalTok{(design_within_}\DecValTok{1}\NormalTok{)}
+\NormalTok{power_within_}\DecValTok{1}\NormalTok{=}\KeywordTok{ANOVA_power}\NormalTok{(design_within_}\DecValTok{1}\NormalTok{,}
+                           \DataTypeTok{nsims =} \DecValTok{100000}\NormalTok{)}
+\NormalTok{exact_within_}\DecValTok{1}\NormalTok{=}\KeywordTok{ANOVA_exact}\NormalTok{(design_within_}\DecValTok{1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 Revisiting our between-participant design, power was 81.14\% when the enjoyment scores were uncorrelated.
 The power for a repeated-measures ANOVA based on these values, where ratings for the three conditions are collected from 80 participants, is 98.38\%.
 The effect size \(\eta_p^2\) is much larger for the within-subject design (\(\eta_p^2\) = 0.12) than for the 3 group between participants design (\(\eta_p^2\) = 0.05).
-As explained by Olejnik and Algina (2003) it is difficult to compare \(\eta_p^2\) across different research designs.
+As explained by Olejnik \& Algina (2003) it is difficult to compare \(\eta_p^2\) across different research designs.
 Box 2 explains how the default calculation of \(\eta_p^2\) by G*Power does not depend on the correlation, and therefore differs from how all other statistical software (including SPSS) calculates \(\eta_p^2\).
 This peculiar choice for a default leads to errors for power analyses that include within-subject factors whenever researchers take a \(\eta_p^2\) reported in the published literature, and enter it in G*Power as the effect size.
 The Superpower package does not require researchers to enter \(\eta_p^2\), but allows researchers to enter either a single value for the correlation between all dependent variables, or a correlation matrix that specifies the expected population correlation for each pair of measurements.
@@ -450,8 +463,10 @@ We specify the pattern of means as \texttt{(1,\ 0,\ 0,\ 0)} for the ordinal inte
 \NormalTok{design_result_cross_}\DecValTok{80}\NormalTok{ <-}\StringTok{ }\KeywordTok{ANOVA_design}\NormalTok{(}
  \DataTypeTok{design =} \StringTok{"2b*2b"}\NormalTok{, }\DataTypeTok{n =} \DecValTok{80}\NormalTok{, }
  \DataTypeTok{mu =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DataTypeTok{sd =} \DecValTok{2}\NormalTok{,}
- \DataTypeTok{labelnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"condition"}\NormalTok{, }\StringTok{"cheerful"}\NormalTok{, }\StringTok{"sad"}\NormalTok{, }
-                \StringTok{"voice"}\NormalTok{, }\StringTok{"human"}\NormalTok{, }\StringTok{"robot"}\NormalTok{)}
+ \DataTypeTok{labelnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"condition"}\NormalTok{, }
+                \StringTok{"cheerful"}\NormalTok{, }\StringTok{"sad"}\NormalTok{, }
+                \StringTok{"voice"}\NormalTok{, }
+                \StringTok{"human"}\NormalTok{, }\StringTok{"robot"}\NormalTok{)}
 \NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -511,7 +526,7 @@ For the ordinal interaction the grand mean is (1+0+0+0)/4, or 0.25.
 Completing the calculation for all four cells for the ordinal interaction gives the values 0.25, -0.25, -0.25, 0.25, and a Cohen's $f$ of 0.125. 
 We see the effect size of the cross-over interaction is twice as large as the effect size of the ordinal interaction. 
 Had we predicted a pattern of means of 2, 0, 0, 0, then the effect size for the ordinal interation would have been f = 0.25. 
-The take-home message is that a 'medium' effect size (f = 0.25) translates into a much more extreme pattern of means in an ordinal interaction than in a disordinal (crossover) interaction, or in a 2x2x2 interaction compared to a 2x2 interaction (see also Perugini et al. (2018)).
+The take-home message is that a 'medium' effect size ($f$ = 0.25) translates into a much more extreme pattern of means in an ordinal interaction than in a disordinal (crossover) interaction, or in a 2x2x2 interaction compared to a 2x2 interaction (see also Perugini et al. (2018)).
 It might therefore be more intuitive to perform a power analysis based on the expected pattern of means, than to perform a power analyses based on Cohen's $f$ or $\eta_p^2$.
 \end{tcolorbox}
 
@@ -550,11 +565,13 @@ We can specify a design with unequal sample sizes and unequal variances as illus
 \NormalTok{design_violation <-}\KeywordTok{ANOVA_design}\NormalTok{(}
  \DataTypeTok{design =} \StringTok{"2b*2b"}\NormalTok{, }\DataTypeTok{n =} \KeywordTok{c}\NormalTok{(}\DecValTok{20}\NormalTok{, }\DecValTok{80}\NormalTok{, }\DecValTok{40}\NormalTok{, }\DecValTok{80}\NormalTok{), }
  \DataTypeTok{mu =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DataTypeTok{sd =} \KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{1}\NormalTok{),}
- \DataTypeTok{labelnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"condition"}\NormalTok{, }\StringTok{"cheerful"}\NormalTok{, }\StringTok{"sad"}\NormalTok{,}
-                \StringTok{"voice"}\NormalTok{, }\StringTok{"human"}\NormalTok{, }\StringTok{"robot"}\NormalTok{))}
+ \DataTypeTok{labelnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"condition"}\NormalTok{, }
+                \StringTok{"cheerful"}\NormalTok{, }\StringTok{"sad"}\NormalTok{,}
+                \StringTok{"voice"}\NormalTok{, }
+                \StringTok{"human"}\NormalTok{, }\StringTok{"robot"}\NormalTok{))}
 \ErrorTok{)}
-\NormalTok{power_result <-}\StringTok{ }\KeywordTok{ANOVA_power}\NormalTok{(design_violation, }
-                            \DataTypeTok{nsims =} \DecValTok{100000}\NormalTok{)}
+\NormalTok{power_result=}\KeywordTok{ANOVA_power}\NormalTok{(design_violation,}
+                         \DataTypeTok{nsims =} \DecValTok{100000}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -610,6 +627,69 @@ The code to reproduce the analyses reported in this article has been made public
 \setlength{\leftskip}{0.5in}
 
 \hypertarget{refs}{}
+\leavevmode\hypertarget{ref-aberson_applied_2019}{}%
+Aberson, C. L. (2019). \emph{Applied Power Analysis for the Behavioral Sciences} (2nd ed.). New York: Routledge.
+
+\leavevmode\hypertarget{ref-algina_detecting_1997}{}%
+Algina, J., \& Keselman, H. J. (1997). Detecting repeated measures effects with univariate and multivariate statistics. \emph{Psychological Methods}, \emph{2}(2), 208--218. doi:\href{https://doi.org/10.1037/1082-989X.2.2.208}{10.1037/1082-989X.2.2.208}
+
+\leavevmode\hypertarget{ref-bretz_multiple_2011}{}%
+Bretz, F., Hothorn, T., \& Westfall, P. H. (2011). \emph{Multiple comparisons using R}. Boca Raton, FL: CRC Press.
+
+\leavevmode\hypertarget{ref-brysbaert_how_2019}{}%
+Brysbaert, M. (2019). How many participants do we have to include in properly powered experiments? A tutorial of power analysis with some simple guidelines. \emph{Journal of Cognition}.
+
+\leavevmode\hypertarget{ref-Campbell2012MorePower6F}{}%
+Campbell, J., \& Thompson, V. A. (2012). MorePower 6.0 for anova with relational confidence intervals and bayesian analysis. \emph{Behavior Research Methods}, \emph{44}, 1255--1265. Retrieved from \url{https://doi.org/10.3758/s13428-012-0186-0}
+
+\leavevmode\hypertarget{ref-cohen_statistical_1988}{}%
+Cohen, J. (1988). \emph{Statistical power analysis for the behavioral sciences} (2nd ed.). Hillsdale, N.J: L. Erlbaum Associates.
+
+\leavevmode\hypertarget{ref-cramer_hidden_2016}{}%
+Cramer, A. O. J., van Ravenzwaaij, D., Matzke, D., Steingroever, H., Wetzels, R., Grasman, R. P. P. P., \ldots{} Wagenmakers, E.-J. (2016). Hidden multiplicity in exploratory multiway ANOVA: Prevalence and remedies. \emph{Psychonomic Bulletin \& Review}, \emph{23}(2), 640--647. doi:\href{https://doi.org/10.3758/s13423-015-0913-5}{10.3758/s13423-015-0913-5}
+
+\leavevmode\hypertarget{ref-delacre_why_2018}{}%
+Delacre, M., Lakens, D., Mora, Y., \& Leys, C. (2018). Why Psychologists Should Always Report the W-test Instead of the F-Test ANOVA. \emph{PsyArXiv}. doi:\href{https://doi.org/10.17605/OSF.IO/WNEZG}{10.17605/OSF.IO/WNEZG}
+
+\leavevmode\hypertarget{ref-faul_gpower_2007}{}%
+Faul, F., Erdfelder, E., Lang, A.-G., \& Buchner, A. (2007). GPower 3: A flexible statistical power analysis program for the social, behavioral, and biomedical sciences. \emph{Behavior Research Methods}, \emph{39}(2), 175--191. doi:\href{https://doi.org/10.3758/BF03193146}{10.3758/BF03193146}
+
+\leavevmode\hypertarget{ref-giner-sorolla_powering_2018}{}%
+Giner-Sorolla, R. (2018, January). Powering Your Interaction. \emph{Approaching Significance}. https://approachingblog.wordpress.com/2018/01/24/powering-your-interaction-2/.
+
+\leavevmode\hypertarget{ref-haans_contrast_2018}{}%
+Haans, A. (2018). Contrast Analysis: A Tutorial. \emph{Practical Assessment, Research \& Evaluation}, \emph{23}(9).
+
+\leavevmode\hypertarget{ref-lakens_equivalence_2018}{}%
+Lakens, D., Scheel, A. M., \& Isager, P. M. (2018). Equivalence Testing for Psychological Research: A Tutorial. \emph{Advances in Methods and Practices in Psychological Science}, \emph{1}(2), 259--269. doi:\href{https://doi.org/10.1177/2515245918770963}{10.1177/2515245918770963}
+
+\leavevmode\hypertarget{ref-lang2017intermediately}{}%
+Lang, A.-G. (2017). Is intermediately inspecting statistical data necessarily a bad research practice? \emph{The Quantitative Methods for Psychology}.
+
+\leavevmode\hypertarget{ref-lenthemmeans}{}%
+Lenth, R. (2019). Emmeans: Estimated marginal means, aka least-squares means. Retrieved from \url{https://CRAN.R-project.org/package=emmeans}
+
+\leavevmode\hypertarget{ref-maxwell_designing_2017}{}%
+Maxwell, S. E., Delaney, H. D., \& Kelley, K. (2017). \emph{Designing Experiments and Analyzing Data: A Model Comparison Perspective, Third Edition} (3rd ed.). New York, NY: Routledge.
+
+\leavevmode\hypertarget{ref-maxwell_sample_2008}{}%
+Maxwell, S. E., Kelley, K., \& Rausch, J. R. (2008). Sample Size Planning for Statistical Power and Accuracy in Parameter Estimation. \emph{Annual Review of Psychology}, \emph{59}(1), 537--563. doi:\href{https://doi.org/10.1146/annurev.psych.59.103006.093735}{10.1146/annurev.psych.59.103006.093735}
+
+\leavevmode\hypertarget{ref-olejnik_generalized_2003}{}%
+Olejnik, S., \& Algina, J. (2003). Generalized Eta and Omega Squared Statistics: Measures of Effect Size for Some Common Research Designs. \emph{Psychological Methods}, \emph{8}(4), 434--447. doi:\href{https://doi.org/10.1037/1082-989X.8.4.434}{10.1037/1082-989X.8.4.434}
+
+\leavevmode\hypertarget{ref-perugini_practical_2018}{}%
+Perugini, M., Gallucci, M., \& Costantini, G. (2018). A Practical Primer To Power Analysis for Simple Experimental Designs. \emph{International Review of Social Psychology}, \emph{31}(1), 20. doi:\href{https://doi.org/10.5334/irsp.181}{10.5334/irsp.181}
+
+\leavevmode\hypertarget{ref-simonsohn_no-way_2014}{}%
+Simonsohn, U. (2014, March). No-way Interactions. \emph{Data Colada}. http://datacolada.org/17.
+
+\leavevmode\hypertarget{ref-westfall2015pangea}{}%
+Westfall, J. (2015a). PANGEA: Power analysis for general anova designs. \emph{Unpublished Manuscript. Available at Jakewestfall.org/Publications/Pangea.pdf}.
+
+\leavevmode\hypertarget{ref-westfall_think_2015}{}%
+Westfall, J. (2015b, May). Think about total N, not n per cell. \emph{Cookie Scientist}. http://jakewestfall.org/blog/index.php/2015/05/26/think-about-total-n-not-n-per-cell/.
+
 \leavevmode\hypertarget{ref-aberson_applied_2019}{}%
 Aberson, C. L. (2019). \emph{Applied Power Analysis for the Behavioral Sciences} (2nd ed.). New York: Routledge.
 

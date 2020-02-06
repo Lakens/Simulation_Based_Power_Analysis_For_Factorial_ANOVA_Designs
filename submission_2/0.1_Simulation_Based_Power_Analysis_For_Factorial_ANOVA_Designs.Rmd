@@ -76,7 +76,7 @@ Compared to G\*power, the pwr R package, and the pwr2ppl R package, Superpower c
 Compared to PANGEA, G\*power, and MorePower, we believe the required input is somewhat more intuitive, as users enter means, standard deviations, and  correlations, instead of effect sizes and variance components. 
 A unique feature of Superpower is that it allows users to easily correct for multiple comparisons in exploratory ANOVA designs, and that it automatically provides the statistical power for all main effects, interactions, and simple comparisons for a specified ANOVA design.
 The online manual at http://arcaldwell49.github.io/SuperpowerBook provides detailed examples for power analyses for One-Way ANOVA designs up to three-way interactions for mixed designs, MANOVA analyses, and power analyses for when ANOVA assumptions are violated, as well as examples validating power analyses in Superpower against existing software.
-Two limitations of the current version of Superpower is that it does not compute power for ANCOVA or linear mixed model designs.
+Two limitations of the current version of Superpower is that it currently cannot compute power for ANCOVAs or linear mixed models.
 Superpower allows researchers to perform simulation-based power analyses, without having extensive programming knowledge, by specifying a pattern of means and a covariance matrix (based on the expected standard deviation and correlation between within participant factors).
 By simulating data for factorial designs with specific parameters researchers can gain a better understanding of the factors that determine the statistical power of an ANOVA, and learn how to design well-powered experiments.
 After a short introduction to statistical power, focusing on the *F*-test, we will illustrate through simulations how the power of factorial ANOVA designs depend on the pattern of means across conditions, the number of factors and levels, the sample size, and whether you need to control the alpha level for multiple comparisons.
@@ -213,7 +213,8 @@ An example of the R code is:
 
 ```{r eval=F, echo=T}
 design_result <- ANOVA_design(
-  design = "2b", n = 80, mu = c(1, 0), sd = 2,
+  design = "2b", n = 80, mu = c(1, 0), 
+  sd = 2,
   labelnames = c("condition", 
                  "cheerful", "sad"))
 ```
@@ -241,7 +242,7 @@ and Cohen's $f$ can be converted into partial eta-squared:
 \begin{equation}
 \eta_p^2 = \sqrt{\frac{f^2}{f^2+1}} \label{eq:f-to-eta}
 \end{equation}
-Power calculations rely on the noncentrality parameter (lambda, ($\lambda$).) 
+Power calculations rely on the noncentrality parameter (lambda, $\lambda$).
 In a between-participants one-way ANOVA lambda is calculated as:
 \begin{equation}
 \lambda = f^2 \times N \label{eq:lambda}
@@ -290,7 +291,7 @@ It makes sense to examine power across a range of assumptions, from more optimis
 In many cases researchers should consider collecting a sample size that guarantees sufficient power for the smallest effect size of interest, instead of the effect size they expect (for examples, see @lakens_equivalence_2018).
 This approach ensures the study can be informative, even when there is uncertainty about the true effect size.
 If ANOVA_power is used the results from the simulation will vary each time the simulation is performed (unless a seed is specified,  e.g., `set.seed = 2019'). 
-A user should specify the number of simulations (the more simulations, the more accurate the results are,, but the longer the simulation takes), the alpha level for the tests, and any adjustments for multiple comparisons that are required.
+A user should specify the number of simulations (the more simulations, the more accurate the results are, but the longer the simulation takes), the alpha level for the tests, and any adjustments for multiple comparisons that are required.
 The output from ANOVA_exact and ANOVA_power are similar, and provides the statistical power for the ANOVA and all simple comparisons between conditions.
 
 ```
@@ -323,7 +324,8 @@ design_result_1 <- ANOVA_design(
   design = "3b", n = 80, 
   mu = c(1, 0.5, 0), sd = 2, 
   labelnames = c("condition", 
-                 "cheerful", "neutral", "sad"))
+                 "cheerful", 
+                 "neutral", "sad"))
 ```
 
 The design now has 3 between-participant conditions, and we can explore what happens if we would collect 80 participants in each condition.
@@ -407,9 +409,9 @@ When performing multiple individual comparisons, we need to choose the alpha lev
 By adjusting for multiple comparisons we ensure that we do not conclude there is an effect in *any* of the individual tests more often than the desired Type 1 error rate.
 Several techniques to control error rates exist, of which the best known is the Bonferroni correction.
 The Holm procedure is slightly more powerful than the Bonferroni correction, without requiring additional assumptions [for other approaches, see @bretz_multiple_2011].
-Power analyses using a manually calculated Bonferoni correction can be performed with the ANOVA_exact function by specifying the adjusted alpha level, but the sequential Holm approach can only be performed in the ANOVA_power simulation approach.
+Power analyses using a manually calculated Bonferroni correction can be performed with the ANOVA_exact function by specifying the adjusted alpha level, but the sequential Holm approach can only be performed in the ANOVA_power simulation approach.
 Because the adjustment for multiple comparisons lowers the alpha level, it also lowers the statistical power.
-For the paired comparisons we see we have approximately `r round(power_result_1_holm$pc_results$power[2],0)`% power for the expected difference between the cheerful and sad conditions after controlling for multiple comparisons with the Holm procedure (compared to `r round(power_result_1$pc_results$power[2],0)`% power without correcting for multiple comparisons), and only `r round(power_result_1_holm$pc_results$power[1],0)`% and `r round(power_result_1_holm$pc_results$power[3],0)`% power when comparing cheerful and sad conditions with the neutral condition.
+For the paired comparisons we see we have approximately `r round(power_result_1_holm$pc_results$power[2],0)`% power for the expected difference between the cheerful and sad conditions after controlling for multiple comparisons with the Holm procedure (compared to `r round(power_result_1$pc_results$power[2],0)`% power without correcting for multiple comparisons), and only `r round(power_result_1_holm$pc_results$power[1],0)`% and `r round(power_result_1_holm$pc_results$power[3],0)`% power when comparing cheerful and sad conditions with the neutral condition, respectively.
 As the number of possible paired comparisons increases, the alpha level is reduced, and power is reduced, all else equal.
 These power analyses reveal the cost (in terms of the statistical power) of exploring across all possible paired comparisons while controlling error rates.
 To maintain an adequate level of power after lowering the alpha level to control the Type 1 error rate after multiple comparisons the sample size should be increased.
@@ -433,7 +435,8 @@ design_within_1 <- ANOVA_design(
   design = "3w", n = 80, mu = c(1, 0.5, 0), 
   sd = 2, r = 0.5,
   labelnames = c("condition", 
-                 "cheerful", "neutral", "sad")
+                 "cheerful", 
+                 "neutral", "sad")
 )
 ```
 
@@ -470,9 +473,9 @@ ANOVA_exact(design_result_within_1, verbose = FALSE)$main_results$power
 We can perform the simulation-based power analysis with the `ANOVA_power` or `ANOVA_exact` functions.
 
 ```{r eval=F, echo=T}
-power_within_1 <- ANOVA_power(design_within_1, 
-                              nsims = 100000)
-exact_within_1 <- ANOVA_exact(design_within_1)
+power_within_1=ANOVA_power(design_within_1,
+                           nsims = 100000)
+exact_within_1=ANOVA_exact(design_within_1)
 ```
 
 Revisiting our between-participant design, power was `r power_result_1$main_results$power`% when the enjoyment scores were uncorrelated.
@@ -496,8 +499,10 @@ We specify the pattern of means as `(1, 0, 0, 0)` for the ordinal interactions, 
 design_result_cross_80 <- ANOVA_design(
  design = "2b*2b", n = 80, 
  mu = c(1, 0, 0, 1), sd = 2,
- labelnames = c("condition", "cheerful", "sad", 
-                "voice", "human", "robot")
+ labelnames = c("condition", 
+                "cheerful", "sad", 
+                "voice", 
+                "human", "robot")
 )
 ```
 
@@ -569,7 +574,7 @@ For the ordinal interaction the grand mean is (1+0+0+0)/4, or 0.25.
 Completing the calculation for all four cells for the ordinal interaction gives the values 0.25, -0.25, -0.25, 0.25, and a Cohen's $f$ of 0.125. 
 We see the effect size of the cross-over interaction is twice as large as the effect size of the ordinal interaction. 
 Had we predicted a pattern of means of 2, 0, 0, 0, then the effect size for the ordinal interation would have been f = 0.25. 
-The take-home message is that a 'medium' effect size (f = 0.25) translates into a much more extreme pattern of means in an ordinal interaction than in a disordinal (crossover) interaction, or in a 2x2x2 interaction compared to a 2x2 interaction (see also Perugini et al. (2018)).
+The take-home message is that a 'medium' effect size ($f$ = 0.25) translates into a much more extreme pattern of means in an ordinal interaction than in a disordinal (crossover) interaction, or in a 2x2x2 interaction compared to a 2x2 interaction (see also Perugini et al. (2018)).
 It might therefore be more intuitive to perform a power analysis based on the expected pattern of means, than to perform a power analyses based on Cohen's $f$ or $\eta_p^2$.
 \end{tcolorbox}
 
@@ -647,11 +652,13 @@ We can specify a design with unequal sample sizes and unequal variances as illus
 design_violation <-ANOVA_design(
  design = "2b*2b", n = c(20, 80, 40, 80), 
  mu = c(0, 0, 0, 0), sd = c(3, 1, 5, 1),
- labelnames = c("condition", "cheerful", "sad",
-                "voice", "human", "robot"))
+ labelnames = c("condition", 
+                "cheerful", "sad",
+                "voice", 
+                "human", "robot"))
 )
-power_result <- ANOVA_power(design_violation, 
-                            nsims = 100000)
+power_result=ANOVA_power(design_violation,
+                         nsims = 100000)
 ```
 
 Based on this simulation, the Type 1 error rate for the main effects and interactions for the ANOVA are approximately `r power_result_violation$main_results$power[1]`%.
