@@ -1,5 +1,4 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
@@ -11,13 +10,13 @@
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
-% Use upquote if available, for straight quotes in verbatim environments
+% use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \IfFileExists{microtype.sty}{% use microtype if available
   \usepackage[]{microtype}
@@ -38,11 +37,10 @@
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
   pdftitle={Simulation-Based Power-Analysis for Factorial ANOVA Designs},
-  pdflang={en-EN},
   pdfkeywords={power analysis, ANOVA, hypothesis test, sample size justification, repeated measures},
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
+  pdfborder={0 0 0},
+  breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
 \usepackage{color}
 \usepackage{fancyvrb}
 \newcommand{\VerbBar}{|}
@@ -92,23 +90,16 @@
 % margins by default, and it is still possible to overwrite the defaults
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
-% Set default figure placement to htbp
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-2}
+
+% set default figure placement to htbp
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-% Make \paragraph and \subparagraph free-standing
-\ifx\paragraph\undefined\else
-  \let\oldparagraph\paragraph
-  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
-\fi
-\ifx\subparagraph\undefined\else
-  \let\oldsubparagraph\subparagraph
-  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
-\fi
+
 % Manuscript styling
 \usepackage{upgreek}
 \captionsetup{font=singlespacing,justification=justified}
@@ -164,12 +155,12 @@ Correspondence concerning this article should be addressed to Daniel Lakens, ATL
 \usepackage{setspace}
 \floatplacement{figure}{H}
 \raggedbottom
-\ifxetex
-  % Load polyglossia as late as possible: uses bidi with RTL langages (e.g. Hebrew, Arabic)
+\ifnum 0\ifxetex 1\fi=0 % if pdftex or luatex
+  \usepackage[shorthands=off,main=english]{babel}
+\else % if xetex
+  % load polyglossia as late as possible as it *could* call bidi if RTL lang (e.g. Hebrew or Arabic)
   \usepackage{polyglossia}
   \setmainlanguage[]{english}
-\else
-  \usepackage[shorthands=off,main=english]{babel}
 \fi
 
 \title{Simulation-Based Power-Analysis for Factorial ANOVA Designs}
@@ -213,8 +204,8 @@ After submitting your manuscript for publication, reviewers ask you to add a stu
 Depending on what the mean enjoyment in the neutral condition in the population is, what sample size would you need to collect for a high powered test of the expected pattern of means?
 A collaborator suggests to switch from a between-subject design to a within-subject design to collect data more efficiently.
 What impact will switching to a within-subject design have on the required sample size?
-The effect size observed in the first study is sometimes refered to as a \enquote{medium} effect size based on the benchmarks by Cohen (1988).
-Does it make sense to perform an a-priori power analysis for a \enquote{medium} effect size if we add a third betwee-subject condition, or switch to a within-subject ANOVA design?
+The effect size observed in the first study is sometimes referred to as a \enquote{medium} effect size based on the benchmarks by Cohen (1988).
+Does it make sense to perform an a-priori power analysis for a \enquote{medium} effect size if we add a third between-subject condition, or switch to a within-subject ANOVA design?
 And if you justify the sample size based on the power for the main effect for the ANOVA, will the study also have sufficient statistical power for the independent comparisons between conditions (or vice versa)?
 Before we answer these questions, let's consider some of the basic concepts of statistical power and how power calculations are typically performed.
 
@@ -244,7 +235,7 @@ For a given sample size we can also calculate a critical \emph{effect size}, and
 Given the sample size of 80 participants per group, observed effects are statistically significant when they are larger than d = 0.31 in a \emph{t}-test, or \(\eta_p^2\) = 0.02 for the \emph{F}-test.
 The goal of an a-priori power analysis is to design a study with a desired probability of observing a significant effect.
 To calculate the sample size required to reach a desired statistical power one has to specify the alternative hypothesis, the sample size, and the alpha level.
-Based on \(\lambda\) (the noncentrality parameter, which together with the degrees of freedom specifies the shape of the expected effect size distribution under a specified alternative hypothesis, illustrated by the black curves in Figure \ref{fig:d-plot} and \ref{fig:eta-plot}) we can calculate the area under the curve that is more extreme than the critical effect size (i.e., Figure \ref{fig:eta-plot} to the right of the critical effect size).
+Based on \(\lambda\) (the non-centrality parameter, which together with the degrees of freedom specifies the shape of the expected effect size distribution under a specified alternative hypothesis, illustrated by the black curves in Figure \ref{fig:d-plot} and \ref{fig:eta-plot}) we can calculate the area under the curve that is more extreme than the critical effect size (i.e., Figure \ref{fig:eta-plot} to the right of the critical effect size).
 Under the alternative hypothesis that the true effect size is d = 0.5 or \(\eta_p^2\) = 0.0588, data are collected from 80 participants in each condition, and an alpha of 0.05 is used, in the long run 88.16\% of the tests will yield a statistically significant result.
 
 \hypertarget{simulating-statistical-power-for-different-factorial-designs}{%
@@ -252,11 +243,11 @@ Under the alternative hypothesis that the true effect size is d = 0.5 or \(\eta_
 
 Superpower can be used in R or in an online Shiny app.
 The code underlying the Superpower R package and the Shiny app generates data for each condition in the design and performs an ANOVA and \emph{t}-tests for all comparisons between conditions.
-The ANOVA\_exact function simulates an \enquote{exact} dataset that has exactly the desired statistical properties, and computes power directly from the test results on this perfect dataset.
-The ANOVA\_power function simulates datasets repeatedly based on the specified parameters and calculates the percentage of statistically significant results.
+The ANOVA\_exact function simulates an \enquote{exact} data set that has exactly the desired statistical properties, and computes power directly from the test results on this perfect data set.
+The ANOVA\_power function simulates data sets repeatedly based on the specified parameters and calculates the percentage of statistically significant results.
 The simulation can be performed based on any design specified using the ANOVA\_design function, the result of which is stored and passed on to either of the two functions to compute power.
 Users specify the design based on the number of levels for each factor (e.g., 2) and whether the factor is manipulated within or between participants (be entering a \enquote{w} or a \enquote{b}).
-Superpower can handle up to three factors (seperated by \enquote{*}).
+Superpower can handle up to three factors (separated by \enquote{*}).
 A 2b design means a single factor with two groups manipulated between participants, whereas a 2b*2w design is a 2 x 2 mixed ANOVA where the first factor is manipulated between, and the second within participants.
 Users also specify the sample size per group (n), the predicted pattern of means across all conditions, the expected standard deviation, and the correlation between variables (for within designs).
 To make it easier to interpret the output users can specify factor names and names for each factor level (e.g., \enquote{condition, cheerful, sad}).
@@ -314,7 +305,7 @@ An example of the input in the Shiny app is:
 
 For a visual confirmation of the input a figure is created that displays the means and standard deviation (see the right side of Figure 3).
 After the design has been specified there are two ways to calculate the statistical power of an ANOVA through simulations.
-The first is to repeatedly simulate datasets and compute the percentage of statistically significant results. This is completed with the ANOVA\_power function which performs a Monte Carlo simulation.
+The first is to repeatedly simulate data sets and compute the percentage of statistically significant results. This is completed with the ANOVA\_power function which performs a Monte Carlo simulation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -323,7 +314,7 @@ The first is to repeatedly simulate datasets and compute the percentage of stati
 \end{Highlighting}
 \end{Shaded}
 
-The second is to simulate a dataset that has \emph{exactly} the desired properties, perform an ANOVA, and use the ANOVA results to compute the statistical power. This is completed with the \texttt{ANOVA\_exact} function which performs a \enquote{exact} simulation.
+The second is to simulate a data set that has \emph{exactly} the desired properties, perform an ANOVA, and use the ANOVA results to compute the statistical power. This is completed with the \texttt{ANOVA\_exact} function which performs a \enquote{exact} simulation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -351,7 +342,7 @@ pairwise comparisons (t-tests)
 p_cheerful_sad    88.191     -0.5017
 \end{verbatim}
 
-The same results are returned in the onine Shiny app, but here users can also choose a \enquote{download PDF report} option to receive the results as a PDF file that can be saved to be included as documentation for sample size requirements (e.g., preregistrations, Registered Reports, or grant applications).
+The same results are returned in the online Shiny app, but here users can also choose a \enquote{download PDF report} option to receive the results as a PDF file that can be saved to be included as documentation for sample size requirements (e.g., preregistration, Registered Reports, or grant applications).
 
 \begin{figure}
 \centering
@@ -484,7 +475,7 @@ Superpower can easily provide statistical power for designs with up to three fac
 Let's assume the researcher plans to perform a follow-up experiment where in addition to making the voice sound cheerful or sad, a second factor is introduced by making the voice sound more robotic compared to the default human-like voice.
 Different patterns of results could be expected in this 2 by 2 design that lead to interactions.
 Either no effect is observed for robotic voices, or the opposite effect is observed for robotic voices (we enjoy a sad robotic voice more than a cheerful one, a \enquote{Marvin-the-Depressed-Robot Effect}).
-We specify the pattern of means as \texttt{(1,\ 0,\ 0,\ 0)} for the ordinal interactions, or as \texttt{(1,\ 0,\ 0,\ 1)} for the cross-over (or disordinal) interaction, as illustrated below (see Figure \ref{fig:mean-plot} for the expected pattern of means).
+We specify the pattern of means as \texttt{(1,\ 0,\ 0,\ 0)} for the ordinal interactions, or as \texttt{(1,\ 0,\ 0,\ 1)} for the cross-over (or dis-ordinal) interaction, as illustrated below (see Figure \ref{fig:mean-plot} for the expected pattern of means).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -526,12 +517,12 @@ u = \frac{k}{1-\rho}
 where $k$ is the number of levels of the within-participant factor, and $\rho$ is the correlation between dependent variables.
 Equations 4 and 5 no longer hold when measurements are correlated.
 The default settings in G\*Power expects an f or $\eta_p^2$ that does not incorporate the correlation, while the correlation is incorporated in the output of software packages such as SPSS. 
-One can  enter the $\eta_p^2$ from SPSS output in G\*Power after checking the 'as in SPSS' checkbox in the options window, but forgetting this is a common mistake in power analyses for within designs in G\*Power.
+One can  enter the $\eta_p^2$ from SPSS output in G\*Power after checking the 'as in SPSS' check box in the options window, but forgetting this is a common mistake in power analyses for within designs in G\*Power.
 For a one-way within-subject design, Cohen's $f$ can be converted into the Cohen's $f$ SPSS uses through:
 \begin{equation}
 f^2_{SPSS} = f^2 \times \frac{k}{k-1} \times \frac{n}{n-1} \times \frac{1}{1-\rho}
 \end{equation}
-and subsequently tranformed to $\eta_p^2$ through Equation 5.
+and subsequently transformed to $\eta_p^2$ through Equation 5.
 \end{tcolorbox}
 
 Superpower also allows users to plot the statistical power across a range of sample sizes for the ANOVA\_exact function (when using the ANOVA\_power function, users will need to steadily increase or decrease the sample size in their simulations).
@@ -553,8 +544,8 @@ Cohen's $f$ is then $f = \frac { \sqrt { \frac { 0.5^2 +-0.5^2 + -0.5^2 + -0.5^2
 For the ordinal interaction the grand mean is (1+0+0+0)/4, or 0.25.
 Completing the calculation for all four cells for the ordinal interaction gives the values 0.25, -0.25, -0.25, 0.25, and a Cohen's $f$ of 0.125. 
 We see the effect size of the cross-over interaction is twice as large as the effect size of the ordinal interaction. 
-Had we predicted a pattern of means of 2, 0, 0, 0, then the effect size for the ordinal interation would have been f = 0.25. 
-The take-home message is that a 'medium' effect size ($f$ = 0.25) translates into a much more extreme pattern of means in an ordinal interaction than in a disordinal (crossover) interaction, or in a 2x2x2 interaction compared to a 2x2 interaction (see also Perugini et al. (2018)).
+Had we predicted a pattern of means of 2, 0, 0, 0, then the effect size for the ordinal interaction would have been f = 0.25. 
+The take-home message is that a 'medium' effect size ($f$ = 0.25) translates into a much more extreme pattern of means in an ordinal interaction than in a dis-ordinal (crossover) interaction, or in a 2x2x2 interaction compared to a 2x2 interaction (see also Perugini et al. (2018)).
 It might therefore be more intuitive to perform a power analysis based on the expected pattern of means, than to perform a power analyses based on Cohen's $f$ or $\eta_p^2$.
 \end{tcolorbox}
 
@@ -576,7 +567,7 @@ An ANOVA is quite robust against violations of the normality assumption, which m
 When the equal variances assumption is violated for a one-way ANOVA Welch's \emph{F}-test is a good default.
 When the sphericity assumption in within designs is violated (when the variances of the differences between all pairs are not equal) a sphericity correction can be applied (e.g., the Greenhouse-Geisser or Huynh-Feldt correction) or a Multivariate ANOVA (MANOVA) can be performed.
 Alternative approaches for ANOVA designs with multiple between factors exist, such as heteroskedasticity robust standard errors.
-Superpower allows researchers to perform power analyses for unequal variances (or correlations) by performing Welch' \emph{F}-test, appying sphercity corrections, or a MANOVA.
+Superpower allows researchers to perform power analyses for unequal variances (or correlations) by performing Welch' \emph{F}-test, applying sphericity corrections, or a MANOVA.
 
 Although some recommendations have been provided to assist researchers to choose an approach to deal with violations of the homogeneity assumption (Algina \& Keselman, 1997), it is often unclear if these violations of the homogeneity assumption are consequential for a given study.
 So far we have used simulations in Superpower to simulate patterns of means where there is a true effect, but we can also simulate a null effect.
