@@ -2,7 +2,7 @@
 title             : "Simulation-Based Power-Analysis for Factorial ANOVA Designs"
 shorttitle        : "Superpower"
 author: 
-  - name          : "Dani&euml;l Lakens"
+  - name          : "Daniel Lakens"
     affiliation   : "1"
     corresponding : yes
     address       : "ATLAS 9.402, 5600 MB, Eindhoven, The Netherlands"
