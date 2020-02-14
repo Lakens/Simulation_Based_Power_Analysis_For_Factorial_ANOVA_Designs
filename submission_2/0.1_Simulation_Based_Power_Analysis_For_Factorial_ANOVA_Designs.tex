@@ -3,6 +3,7 @@
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
+  english,
   ,jou,floatsintext]{apa6}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
@@ -37,7 +38,7 @@
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
   pdftitle={Simulation-Based Power-Analysis for Factorial ANOVA Designs},
-  pdfauthor={Daniël Lakens~\& Aaron R. Caldwell},
+  pdflang={en-EN},
   pdfkeywords={power analysis, ANOVA, hypothesis test, sample size justification},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
@@ -99,48 +100,85 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\shorttitle{Superpower}
-\affiliation{
-\vspace{0.5cm}
-\textsuperscript{1} Human-Technology Interaction Group, Eindhoven University of Technology, The Netherlands\\\textsuperscript{2} Department of Health, Human Performance and Recreation, University of Arkansas, USA\\\textsuperscript{3} Thermal and Mountain Medicine Division, U.S. Army Research Institute of Environmental Medicine, USA}
-\keywords{power analysis, ANOVA, hypothesis test, sample size justification\newline\indent Word count: 4654 words.}
-\usepackage{csquotes}
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+% Manuscript styling
 \usepackage{upgreek}
 \captionsetup{font=singlespacing,justification=justified}
 
+% Table formatting
 \usepackage{longtable}
 \usepackage{lscape}
-\usepackage{multirow}
-\usepackage{tabularx}
-\usepackage[flushleft]{threeparttable}
-\usepackage{threeparttablex}
+% \usepackage[counterclockwise]{rotating}   % Landscape page setup for large tables
+\usepackage{multirow}		% Table styling
+\usepackage{tabularx}		% Control Column width
+\usepackage[flushleft]{threeparttable}	% Allows for three part tables with a specified notes section
+\usepackage{threeparttablex}            % Lets threeparttable work with longtable
 
+% Create new environments so endfloat can handle them
+% \newenvironment{ltable}
+%   {\begin{landscape}\begin{center}\begin{threeparttable}}
+%   {\end{threeparttable}\end{center}\end{landscape}}
 \newenvironment{lltable}{\begin{landscape}\begin{center}\begin{ThreePartTable}}{\end{ThreePartTable}\end{center}\end{landscape}}
 
+% Enables adjusting longtable caption width to table width
+% Solution found at http://golatex.de/longtable-mit-caption-so-breit-wie-die-tabelle-t15767.html
 \makeatletter
 \newcommand\LastLTentrywidth{1em}
 \newlength\longtablewidth
 \setlength{\longtablewidth}{1in}
 \newcommand{\getlongtablewidth}{\begingroup \ifcsname LT@\roman{LT@tables}\endcsname \global\longtablewidth=0pt \renewcommand{\LT@entry}[2]{\global\advance\longtablewidth by ##2\relax\gdef\LastLTentrywidth{##2}}\@nameuse{LT@\roman{LT@tables}} \fi \endgroup}
+
+% \setlength{\parindent}{0.5in}
+% \setlength{\parskip}{0pt plus 0pt minus 0pt}
+
+% \usepackage{etoolbox}
+\makeatletter
+\patchcmd{\HyOrg@maketitle}
+  {\section{\normalfont\normalsize\abstractname}}
+  {\section*{\normalfont\normalsize\abstractname}}
+  {}{\typeout{Failed to patch abstract.}}
+\makeatother
+\shorttitle{Superpower}
+\author{Dani\"{e}l Lakens\textsuperscript{1}\ \& Aaron R. Caldwell\textsuperscript{2,3}}
+\affiliation{
+\vspace{0.5cm}
+\textsuperscript{1} Human-Technology Interaction Group, Eindhoven University of Technology, The Netherlands\\\textsuperscript{2} Department of Health, Human Performance and Recreation, University of Arkansas, USA\\\textsuperscript{3} Thermal and Mountain Medicine Division, U.S. Army Research Institute of Environmental Medicine, USA}
+\authornote{
+
+Correspondence concerning this article should be addressed to Dani\textbackslash{}"\{e\}l Lakens, ATLAS 9.402, 5600 MB, Eindhoven, The Netherlands. E-mail: D.Lakens@tue.nl}
+\keywords{power analysis, ANOVA, hypothesis test, sample size justification\newline\indent Word count: 4654 words.}
+\usepackage{dblfloatfix}
+
+
+\usepackage{csquotes}
 \usepackage[utf8]{inputenc}
 \usepackage{tcolorbox}
 \usepackage{float}
 \usepackage{setspace}
 \floatplacement{figure}{H}
 \raggedbottom
+\ifxetex
+  % Load polyglossia as late as possible: uses bidi with RTL langages (e.g. Hebrew, Arabic)
+  \usepackage{polyglossia}
+  \setmainlanguage[]{english}
+\else
+  \usepackage[shorthands=off,main=english]{babel}
+\fi
 
 \title{Simulation-Based Power-Analysis for Factorial ANOVA Designs}
-\author{Daniël Lakens\textsuperscript{1}~\& Aaron R. Caldwell\textsuperscript{2,3}}
+
 \date{}
-
-\authornote{
-
-Correspondence concerning this article should be addressed to Daniël Lakens, ATLAS 9.402, 5600 MB, Eindhoven, The Netherlands. E-mail: \href{mailto:D.Lakens@tue.nl}{\nolinkurl{D.Lakens@tue.nl}}}
 
 \abstract{
 Researchers often rely on analysis of variance (ANOVA) when they report results of experiments. To ensure a study is adequately powered to yield informative results when performing an ANOVA, researchers can perform an a-priori power analysis. However, power analysis for factorial ANOVA designs is often a challenge. Current software solutions do not allow power analyses for complex designs with several within-subject factors. Moreover, power analyses often need partial eta-squared or Cohen's \(f\) as input, but these effect sizes are not intuitive and do not generalize to different experimental designs. We have created the R package Superpower and online Shiny apps to enable researchers without extensive programming experience to perform simulation-based power analysis for ANOVA designs of up to three within- or between-subject factors. Predicted effects are entered by specifying means, standard deviations, and for within-subject factors the correlations. The simulation provides the statistical power for all ANOVA main effects, interactions, and individual comparisons, and allows researchers to correct for multiple comparisons. The software can plot power across a range of sample sizes, can control error rates for multiple comparisons, and can compute power when the homogeneity or sphericity assumptions are violated. This tutorial will demonstrate how to perform a-priori power analysis to design informative studies for main effects, interactions, and individual comparisons, and highlights important factors that determine the statistical power for factorial ANOVA designs.
-
-
 }
 
 \begin{document}
@@ -620,10 +658,10 @@ The code to reproduce the analyses reported in this article has been made public
 
 \hypertarget{refs}{}
 \leavevmode\hypertarget{ref-aberson_applied_2019}{}%
-Aberson, C. L. (2019). \emph{Applied Power Analysis for the Behavioral Sciences} (2nd ed.). New York: Routledge.
+Aberson, C. L. (2019). \emph{Applied Power Analysis for the Behavioral Sciences} (2nd ed). New York: Routledge.
 
 \leavevmode\hypertarget{ref-algina_detecting_1997}{}%
-Algina, J., \& Keselman, H. J. (1997). Detecting repeated measures effects with univariate and multivariate statistics. \emph{Psychological Methods}, \emph{2}(2), 208--218. doi:\href{https://doi.org/10.1037/1082-989X.2.2.208}{10.1037/1082-989X.2.2.208}
+Algina, J., \& Keselman, H. J. (1997). Detecting repeated measures effects with univariate and multivariate statistics. \emph{Psychological Methods}, \emph{2}(2), 208--218. \url{https://doi.org/10.1037/1082-989X.2.2.208}
 
 \leavevmode\hypertarget{ref-bretz_multiple_2011}{}%
 Bretz, F., Hothorn, T., \& Westfall, P. H. (2011). \emph{Multiple comparisons using R}. Boca Raton, FL: CRC Press.
@@ -635,28 +673,28 @@ Brysbaert, M. (2019). How many participants do we have to include in properly po
 Campbell, J., \& Thompson, V. A. (2012). MorePower 6.0 for anova with relational confidence intervals and bayesian analysis. \emph{Behavior Research Methods}, \emph{44}, 1255--1265. Retrieved from \url{https://doi.org/10.3758/s13428-012-0186-0}
 
 \leavevmode\hypertarget{ref-cohen_statistical_1988}{}%
-Cohen, J. (1988). \emph{Statistical power analysis for the behavioral sciences} (2nd ed.). Hillsdale, N.J: L. Erlbaum Associates.
+Cohen, J. (1988). \emph{Statistical power analysis for the behavioral sciences} (2nd ed). Hillsdale, N.J: L. Erlbaum Associates.
 
 \leavevmode\hypertarget{ref-cramer_hidden_2016}{}%
-Cramer, A. O. J., van Ravenzwaaij, D., Matzke, D., Steingroever, H., Wetzels, R., Grasman, R. P. P. P., \ldots{} Wagenmakers, E.-J. (2016). Hidden multiplicity in exploratory multiway ANOVA: Prevalence and remedies. \emph{Psychonomic Bulletin \& Review}, \emph{23}(2), 640--647. doi:\href{https://doi.org/10.3758/s13423-015-0913-5}{10.3758/s13423-015-0913-5}
+Cramer, A. O. J., van Ravenzwaaij, D., Matzke, D., Steingroever, H., Wetzels, R., Grasman, R. P. P. P., \ldots{} Wagenmakers, E.-J. (2016). Hidden multiplicity in exploratory multiway ANOVA: Prevalence and remedies. \emph{Psychonomic Bulletin \& Review}, \emph{23}(2), 640--647. \url{https://doi.org/10.3758/s13423-015-0913-5}
 
 \leavevmode\hypertarget{ref-delacre_why_2017}{}%
-Delacre, M., Lakens, D., \& Leys, C. (2017). Why Psychologists Should by Default Use Welch's \emph{t}-test Instead of Student's \emph{t}-test. \emph{International Review of Social Psychology}, \emph{30}(1). doi:\href{https://doi.org/10.5334/irsp.82}{10.5334/irsp.82}
+Delacre, M., Lakens, D., \& Leys, C. (2017). Why Psychologists Should by Default Use Welch's \emph{t}-test Instead of Student's \emph{t}-test. \emph{International Review of Social Psychology}, \emph{30}(1). \url{https://doi.org/10.5334/irsp.82}
 
 \leavevmode\hypertarget{ref-delacre_taking_2019}{}%
-Delacre, M., Leys, C., Mora, Y. L., \& Lakens, D. (2019). Taking Parametric Assumptions Seriously: Arguments for the Use of Welch's \emph{f}-test instead of the Classical \emph{f}-test in One-Way ANOVA. \emph{International Review of Social Psychology}, \emph{32}(1), 13. doi:\href{https://doi.org/10.5334/irsp.198}{10.5334/irsp.198}
+Delacre, M., Leys, C., Mora, Y. L., \& Lakens, D. (2019). Taking Parametric Assumptions Seriously: Arguments for the Use of Welch's \emph{f}-test instead of the Classical \emph{f}-test in One-Way ANOVA. \emph{International Review of Social Psychology}, \emph{32}(1), 13. \url{https://doi.org/10.5334/irsp.198}
 
 \leavevmode\hypertarget{ref-faul_gpower_2007}{}%
-Faul, F., Erdfelder, E., Lang, A.-G., \& Buchner, A. (2007). GPower 3: A flexible statistical power analysis program for the social, behavioral, and biomedical sciences. \emph{Behavior Research Methods}, \emph{39}(2), 175--191. doi:\href{https://doi.org/10.3758/BF03193146}{10.3758/BF03193146}
+Faul, F., Erdfelder, E., Lang, A.-G., \& Buchner, A. (2007). GPower 3: A flexible statistical power analysis program for the social, behavioral, and biomedical sciences. \emph{Behavior Research Methods}, \emph{39}(2), 175--191. \url{https://doi.org/10.3758/BF03193146}
 
 \leavevmode\hypertarget{ref-giner-sorolla_powering_2018}{}%
-Giner-Sorolla, R. (2018, January). Powering Your Interaction. \emph{Approaching Significance}. https://approachingblog.wordpress.com/2018/01/24/powering-your-interaction-2/.
+Giner-Sorolla, R. (2018). Powering Your Interaction. \emph{Approaching Significance}. https://approachingblog.wordpress.com/2018/01/24/powering-your-interaction-2/.
 
 \leavevmode\hypertarget{ref-haans_contrast_2018}{}%
 Haans, A. (2018). Contrast Analysis: A Tutorial. \emph{Practical Assessment, Research \& Evaluation}, \emph{23}(9).
 
 \leavevmode\hypertarget{ref-lakens_equivalence_2018}{}%
-Lakens, D., Scheel, A. M., \& Isager, P. M. (2018). Equivalence Testing for Psychological Research: A Tutorial. \emph{Advances in Methods and Practices in Psychological Science}, \emph{1}(2), 259--269. doi:\href{https://doi.org/10.1177/2515245918770963}{10.1177/2515245918770963}
+Lakens, D., Scheel, A. M., \& Isager, P. M. (2018). Equivalence Testing for Psychological Research: A Tutorial. \emph{Advances in Methods and Practices in Psychological Science}, \emph{1}(2), 259--269. \url{https://doi.org/10.1177/2515245918770963}
 
 \leavevmode\hypertarget{ref-lang2017intermediately}{}%
 Lang, A.-G. (2017). Is intermediately inspecting statistical data necessarily a bad research practice? \emph{The Quantitative Methods for Psychology}.
@@ -665,24 +703,24 @@ Lang, A.-G. (2017). Is intermediately inspecting statistical data necessarily a 
 Lenth, R. (2019). Emmeans: Estimated marginal means, aka least-squares means. Retrieved from \url{https://CRAN.R-project.org/package=emmeans}
 
 \leavevmode\hypertarget{ref-maxwell_designing_2017}{}%
-Maxwell, S. E., Delaney, H. D., \& Kelley, K. (2017). \emph{Designing Experiments and Analyzing Data: A Model Comparison Perspective, Third Edition} (3rd ed.). New York, NY: Routledge.
+Maxwell, S. E., Delaney, H. D., \& Kelley, K. (2017). \emph{Designing Experiments and Analyzing Data: A Model Comparison Perspective, Third Edition} (3rd ed). New York, NY: Routledge.
 
 \leavevmode\hypertarget{ref-maxwell_sample_2008}{}%
-Maxwell, S. E., Kelley, K., \& Rausch, J. R. (2008). Sample Size Planning for Statistical Power and Accuracy in Parameter Estimation. \emph{Annual Review of Psychology}, \emph{59}(1), 537--563. doi:\href{https://doi.org/10.1146/annurev.psych.59.103006.093735}{10.1146/annurev.psych.59.103006.093735}
+Maxwell, S. E., Kelley, K., \& Rausch, J. R. (2008). Sample Size Planning for Statistical Power and Accuracy in Parameter Estimation. \emph{Annual Review of Psychology}, \emph{59}(1), 537--563. \url{https://doi.org/10.1146/annurev.psych.59.103006.093735}
 
 \leavevmode\hypertarget{ref-olejnik_generalized_2003}{}%
-Olejnik, S., \& Algina, J. (2003). Generalized Eta and Omega Squared Statistics: Measures of Effect Size for Some Common Research Designs. \emph{Psychological Methods}, \emph{8}(4), 434--447. doi:\href{https://doi.org/10.1037/1082-989X.8.4.434}{10.1037/1082-989X.8.4.434}
+Olejnik, S., \& Algina, J. (2003). Generalized Eta and Omega Squared Statistics: Measures of Effect Size for Some Common Research Designs. \emph{Psychological Methods}, \emph{8}(4), 434--447. \url{https://doi.org/10.1037/1082-989X.8.4.434}
 
 \leavevmode\hypertarget{ref-perugini_practical_2018}{}%
-Perugini, M., Gallucci, M., \& Costantini, G. (2018). A Practical Primer To Power Analysis for Simple Experimental Designs. \emph{International Review of Social Psychology}, \emph{31}(1), 20. doi:\href{https://doi.org/10.5334/irsp.181}{10.5334/irsp.181}
+Perugini, M., Gallucci, M., \& Costantini, G. (2018). A Practical Primer To Power Analysis for Simple Experimental Designs. \emph{International Review of Social Psychology}, \emph{31}(1), 20. \url{https://doi.org/10.5334/irsp.181}
 
 \leavevmode\hypertarget{ref-simonsohn_no-way_2014}{}%
-Simonsohn, U. (2014, March). No-way Interactions. \emph{Data Colada}. http://datacolada.org/17.
+Simonsohn, U. (2014). No-way Interactions. \emph{Data Colada}. http://datacolada.org/17.
 
 \leavevmode\hypertarget{ref-westfall2015pangea}{}%
 Westfall, J. (2015a). PANGEA: Power analysis for general anova designs. \emph{Unpublished Manuscript. Available at Jakewestfall.org/Publications/Pangea.pdf}.
 
 \leavevmode\hypertarget{ref-westfall_think_2015}{}%
-Westfall, J. (2015b, May). Think about total N, not n per cell. \emph{Cookie Scientist}. http://jakewestfall.org/blog/index.php/2015/05/26/think-about-total-n-not-n-per-cell/.
+Westfall, J. (2015b). Think about total N, not n per cell. \emph{Cookie Scientist}. http://jakewestfall.org/blog/index.php/2015/05/26/think-about-total-n-not-n-per-cell/.
 
 \end{document}
