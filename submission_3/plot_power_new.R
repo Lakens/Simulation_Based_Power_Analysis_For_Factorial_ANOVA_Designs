@@ -22,6 +22,9 @@
 #'   \item{\code{"effect_sizes"}}{Effect sizes (partial eta-squared) from ANOVA results.}
 #'   \item{\code{"effect_sizes_manova"}}{Effect sizes (Pillai's Trace) from MANOVA results. Returns NULL if no within-subject factors.}
 #'   \item{\code{"effect_sizes_emm"}}{ Effect sizes (cohen's f) estimated marginal means results. Returns NULL if emm = FALSE.}
+#'   \item{\code{"n_for_power"}}{Sample sizes for each effect to achieve desired power for ANOVA.}
+#'   \item{\code{"n_for_power_manova"}}{Sample sizes for each effect to achieve desired power for MANOVA results. Returns NULL if no within-subject factors.}
+#'   \item{\code{"n_for_power_emm"}}{Sample sizes for each effect to achieve desired power for estimated marginal means results. Returns NULL if emm = FALSE.}
 #'   
 #' }
 #' 
@@ -215,19 +218,19 @@ plot_power <- function(design_result,
   plot_data$variable <- as.factor(plot_data$variable)
 
   #create data frame for annotation for desired power
-  annotate_df <- as.data.frame(matrix(0, ncol = 4, nrow = length(row.names(exact_result$main_results)))) #three rows, for N, power, and variable label
-  colnames(annotate_df) <- c("n", "power", "variable", "label") # add columns names
-  annotate_df$variable <- as.factor(c(row.names(exact_result$main_results))) #add variable label names
+  n_for_power <- as.data.frame(matrix(0, ncol = 4, nrow = length(row.names(exact_result$main_results)))) #three rows, for N, power, and variable label
+  colnames(n_for_power) <- c("n", "power", "variable", "label") # add columns names
+  n_for_power$variable <- as.factor(c(row.names(exact_result$main_results))) #add variable label names
 
   # Create a dataframe with columns for each effect and rows for the N and power for that N
   for (i in 1:length_power) {
-    annotate_df[i,1] <- tryCatch(findInterval(desired_power, power_df[,(1 + i)]), error=function(e){max_n-min_n}) + min_n #use findinterval to find the first value in the vector before desired power. Add 1 (we want to achieve the power, not stop just short) then add min_n (because the vector starts at min_n, not 0)
-    if(annotate_df[i,1] > max_n){annotate_df[i,1] <- max_n} # catches cases that do not reach desired power. Then just plot max_n
-    if(annotate_df[i,1] == max_n){annotate_df[i,1] <- (min_n+max_n)/2} # We will plot that max power is not reached at midpoint of max n
-    annotate_df[i,2] <- power_df[annotate_df[i,1]-min_n+1,(i+1)] #store exact power at N for which we pass desired power (for plot)
-    if(annotate_df[i,2] < desired_power){annotate_df[i,4] <- "Desired Power Not Reached"}
-    if(annotate_df[i,2] >= desired_power){annotate_df[i,4] <- annotate_df[i,1]}
-    if(annotate_df[i,2] < desired_power){annotate_df[i,2] <- 5}
+    n_for_power[i,1] <- tryCatch(findInterval(desired_power, power_df[,(1 + i)]), error=function(e){max_n-min_n}) + min_n #use findinterval to find the first value in the vector before desired power. Add 1 (we want to achieve the power, not stop just short) then add min_n (because the vector starts at min_n, not 0)
+    if(n_for_power[i,1] > max_n){n_for_power[i,1] <- max_n} # catches cases that do not reach desired power. Then just plot max_n
+    if(n_for_power[i,1] == max_n){n_for_power[i,1] <- (min_n+max_n)/2} # We will plot that max power is not reached at midpoint of max n
+    n_for_power[i,2] <- power_df[n_for_power[i,1]-min_n+1,(i+1)] #store exact power at N for which we pass desired power (for plot)
+    if(n_for_power[i,2] < desired_power){n_for_power[i,4] <- "Desired Power Not Reached"}
+    if(n_for_power[i,2] >= desired_power){n_for_power[i,4] <- n_for_power[i,1]}
+    if(n_for_power[i,2] < desired_power){n_for_power[i,2] <- 5}
   }
   
   p1 <- ggplot(data = plot_data, aes(x = n, y = value)) +
@@ -237,26 +240,26 @@ plot_power <- function(design_result,
     theme_bw() +
     labs(x = "Sample size per condition", y = "Power") +
     geom_line(y = desired_power, colour="red", alpha = 0.3, size = 1) + 
-    geom_label(data = annotate_df, aes(x = n, y = power, label = label)) +
+    geom_label(data = n_for_power, aes(x = n, y = power, label = label)) +
     facet_grid(variable ~ .)
 
   if (run_manova == TRUE) {
     plot_data_manova <- suppressMessages(melt(power_df_manova, id = c('n')))
 
     #create data frame for annotation for desired power for manova
-    annotate_df_manova <- as.data.frame(matrix(0, ncol = 3, nrow = length(row.names(exact_result$manova_results)))) #three rows, for N, power, and variable label
-    colnames(annotate_df_manova) <- c("n", "power", "variable") # add columns names
-    annotate_df_manova$variable <- as.factor(c(row.names(exact_result$manova_results))) #add variable label names
+    n_for_power_manova <- as.data.frame(matrix(0, ncol = 3, nrow = length(row.names(exact_result$manova_results)))) #three rows, for N, power, and variable label
+    colnames(n_for_power_manova) <- c("n", "power", "variable") # add columns names
+    n_for_power_manova$variable <- as.factor(c(row.names(exact_result$manova_results))) #add variable label names
    
     # Create a dataframe with columns for each effect and rows for the N and power for that N
     for (i in 1:length_power_manova) {
-      annotate_df_manova[i,1] <- tryCatch(findInterval(desired_power, power_df_manova[,(1 + i)]), error=function(e){max_n-min_n}) + min_n #use findinterval to find the first value in the vector before desired power. Add 1 (we want to achieve the power, not stop just short) then add min_n (because the vector starts at min_n, not 0)
-      if(annotate_df_manova[i,1] > max_n){annotate_df_manova[i,1] <- max_n} # catches cases that do not reach desired power. Then just plot max_n
-      if(annotate_df_manova[i,1] == max_n){annotate_df_manova[i,1] <- (min_n+max_n)/2} # We will plot that max power is not reached at midpoint of max n
-      annotate_df_manova[i,2] <- power_df_manova[annotate_df_manova[i,1]-min_n+1,(i+1)] #store exact power at N for which we pass desired power (for plot)
-      if(annotate_df_manova[i,2] < desired_power){annotate_df_manova[i,4] <- "Desired Power Not Reached"}
-      if(annotate_df_manova[i,2] >= desired_power){annotate_df_manova[i,4] <- annotate_df_manova[i,1]}
-      if(annotate_df_manova[i,2] < desired_power){annotate_df_manova[i,2] <- 5}
+      n_for_power_manova[i,1] <- tryCatch(findInterval(desired_power, power_df_manova[,(1 + i)]), error=function(e){max_n-min_n}) + min_n #use findinterval to find the first value in the vector before desired power. Add 1 (we want to achieve the power, not stop just short) then add min_n (because the vector starts at min_n, not 0)
+      if(n_for_power_manova[i,1] > max_n){n_for_power_manova[i,1] <- max_n} # catches cases that do not reach desired power. Then just plot max_n
+      if(n_for_power_manova[i,1] == max_n){n_for_power_manova[i,1] <- (min_n+max_n)/2} # We will plot that max power is not reached at midpoint of max n
+      n_for_power_manova[i,2] <- power_df_manova[n_for_power_manova[i,1]-min_n+1,(i+1)] #store exact power at N for which we pass desired power (for plot)
+      if(n_for_power_manova[i,2] < desired_power){n_for_power_manova[i,4] <- "Desired Power Not Reached"}
+      if(n_for_power_manova[i,2] >= desired_power){n_for_power_manova[i,4] <- n_for_power_manova[i,1]}
+      if(n_for_power_manova[i,2] < desired_power){n_for_power_manova[i,2] <- 5}
     }
 
     p2 <- ggplot(data = plot_data_manova,
@@ -265,7 +268,7 @@ plot_power <- function(design_result,
       scale_x_continuous(limits = c(min_n, max_n)) +
       scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 10)) +
       geom_line(y = desired_power, colour="red", alpha = 0.3, size = 1) + 
-      geom_label(data = annotate_df_manova, aes(x = n, y = power, label = n)) +
+      geom_label(data = n_for_power_manova, aes(x = n, y = power, label = n)) +
       theme_bw() +
       labs(x = "Sample size per condition", y = "Power") +
       facet_grid(variable ~ .)
@@ -275,19 +278,19 @@ plot_power <- function(design_result,
     plot_data_emm <- suppressMessages(melt(power_df_emm, id = c('n')))
     
     #create data frame for annotation for desired power for emmeans
-    annotate_df_emm <- as.data.frame(matrix(0, ncol = 3, nrow = length(levels(exact_result$emmeans$contrasts@grid$contrast)))) #three rows, for N, power, and variable label
-    colnames(annotate_df_emm) <- c("n", "power", "variable") # add columns names
-    annotate_df_emm$variable <- as.factor(levels(exact_result$emmeans$contrasts@grid$contrast)) #add variable label names
+    n_for_power_emm <- as.data.frame(matrix(0, ncol = 3, nrow = length(levels(exact_result$emmeans$contrasts@grid$contrast)))) #three rows, for N, power, and variable label
+    colnames(n_for_power_emm) <- c("n", "power", "variable") # add columns names
+    n_for_power_emm$variable <- as.factor(levels(exact_result$emmeans$contrasts@grid$contrast)) #add variable label names
     i<-1
     # Create a dataframe with columns for each effect and rows for the N and power for that N
     for (i in 1:length_power_emm) {
-      annotate_df_emm[i,1] <- tryCatch(findInterval(desired_power, power_df_emm[,(1 + i)]), error=function(e){max_n-min_n}) + min_n #use findinterval to find the first value in the vector before desired power. Add 1 (we want to achieve the power, not stop just short) then add min_n (because the vector starts at min_n, not 0)
-      if(annotate_df_emm[i,1] > max_n){annotate_df_emm[i,1] <- max_n} # catches cases that do not reach desired power. Then just plot max_n
-      if(annotate_df_emm[i,1] == max_n){annotate_df_emm[i,1] <- (min_n+max_n)/2} # We will plot that max power is not reached at midpoint of max n
-      annotate_df_emm[i,2] <- power_df_emm[annotate_df_emm[i,1]-min_n+1,(i+1)] #store exact power at N for which we pass desired power (for plot)
-      if(annotate_df_emm[i,2] < desired_power){annotate_df_emm[i,4] <- "Desired Power Not Reached"}
-      if(annotate_df_emm[i,2] >= desired_power){annotate_df_emm[i,4] <- annotate_df_emm[i,1]}
-      if(annotate_df_emm[i,2] < desired_power){annotate_df_emm[i,2] <- 5}
+      n_for_power_emm[i,1] <- tryCatch(findInterval(desired_power, power_df_emm[,(1 + i)]), error=function(e){max_n-min_n}) + min_n #use findinterval to find the first value in the vector before desired power. Add 1 (we want to achieve the power, not stop just short) then add min_n (because the vector starts at min_n, not 0)
+      if(n_for_power_emm[i,1] > max_n){n_for_power_emm[i,1] <- max_n} # catches cases that do not reach desired power. Then just plot max_n
+      if(n_for_power_emm[i,1] == max_n){n_for_power_emm[i,1] <- (min_n+max_n)/2} # We will plot that max power is not reached at midpoint of max n
+      n_for_power_emm[i,2] <- power_df_emm[n_for_power_emm[i,1]-min_n+1,(i+1)] #store exact power at N for which we pass desired power (for plot)
+      if(n_for_power_emm[i,2] < desired_power){n_for_power_emm[i,4] <- "Desired Power Not Reached"}
+      if(n_for_power_emm[i,2] >= desired_power){n_for_power_emm[i,4] <- n_for_power_emm[i,1]}
+      if(n_for_power_emm[i,2] < desired_power){n_for_power_emm[i,2] <- 5}
     }
 
     p3 <- ggplot(data = plot_data_emm,
@@ -296,7 +299,7 @@ plot_power <- function(design_result,
       scale_x_continuous(limits = c(min_n, max_n)) +
       scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 10)) +
       geom_line(y = desired_power, colour="red", alpha = 0.3, size = 1) + 
-      geom_label(data = annotate_df_emm, aes(x = n, y = power, label = n)) +
+      geom_label(data = n_for_power_emm, aes(x = n, y = power, label = n)) +
       theme_bw() +
       labs(x = "Sample size per condition", y = "Power") +
       facet_grid(variable ~ .)
@@ -310,12 +313,14 @@ plot_power <- function(design_result,
     p2 = NULL
     power_df_manova = NULL
     effect_sizes_manova = NULL
+    n_for_power_manova = NULL
   }
   
   if (emm == FALSE) {
     p3 = NULL
     power_df_emm = NULL
     effect_sizes_emm = NULL
+    n_for_power_emm = NULL
   }
 
   #Save effect sizes
@@ -337,5 +342,8 @@ plot_power <- function(design_result,
                  power_df_emm = power_df_emm,
                  effect_sizes = effect_sizes,
                  effect_sizes_manova = effect_sizes_manova,
-                 effect_sizes_emm = effect_sizes_emm))
+                 effect_sizes_emm = effect_sizes_emm,
+                 n_for_power = n_for_power,
+                 n_for_power_manova = n_for_power_manova,
+                 n_for_power_emm = n_for_power_emm))
 }

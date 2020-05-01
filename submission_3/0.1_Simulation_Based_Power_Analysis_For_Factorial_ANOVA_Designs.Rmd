@@ -271,7 +271,7 @@ For a visual confirmation of the input the R function creates a figure that disp
 After the design has been specified there are two ways to calculate the statistical power of an ANOVA through simulations. 
 The ANOVA_power function simulates data sets repeatedly based on the specified parameters and calculates the percentage of statistically significant results.
 In the code below 1000 simulations are performed, which should take around approximately 15 seconds and yields reasonably accurate results when trying out the power analysis. 
-For most designs increasing the number of simulations to 10000, which would take a few minutes to complete, should give accurate enough results for most practical purposes.
+For most designs increasing the number of simulations to 10,000, which would take a few minutes to complete, should give accurate enough results for most practical purposes.
 
 ```{r eval=F, echo=T}
 result_monte <- ANOVA_power(design_result, 
@@ -307,7 +307,9 @@ p_cheerful_sad    88.191     -0.5017
 
 ![Screenshot of ANOVA_power Shiny app.](screenshots/anova_power.png)
 
+
 ![Screenshot of the results of the power analysis in the ANOVA_power Shiny app.](screenshots/anova_power_result.png)
+
 The same results are returned in the online Shiny app, but here users can also choose a 'download PDF report' option to receive the results as a PDF file that can be saved to be included as documentation for sample size requirements (e.g., preregistration, Registered Reports, or grant applications). 
 An example of the input in the Shiny app and results are presented in Figures 3 and 4:
 
@@ -511,7 +513,7 @@ u = \frac{k}{1-\rho}
 \end{equation}
 where $k$ is the number of levels of the within-participant factor, and $\rho$ is the correlation between dependent variables.
 Equations 4 and 5 no longer hold when measurements are correlated.
-The default settings in G$^{*}$Power expects an f or $\eta_p^2$ that does not incorporate the correlation, while the correlation is incorporated in the output of software packages such as SPSS. 
+The default settings in G$^{*}$Power expects an $f$ or $\eta_p^2$ that does not incorporate the correlation, while the correlation is incorporated in the output of software packages such as SPSS. 
 One can  enter the $\eta_p^2$ from SPSS output in G$^{*}$Power after checking the 'as in SPSS' check box in the options window, but forgetting this is a common mistake in power analyses for within designs in G$^{*}$Power.
 For a one-way within-subject design, Cohen's $f$ can be converted into the Cohen's $f$ SPSS uses through:
 \begin{equation}
